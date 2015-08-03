@@ -1,0 +1,9 @@
+node_modules/
+npm-debug.log
+.npm/
+coverage/
+.grunt/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

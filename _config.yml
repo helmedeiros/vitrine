@@ -1,0 +1,11 @@
+title: Vitrine
+description: Shoppable image-tag plugin
+url: https://helmedeiros.github.io
+baseurl: /vitrine
+author: Helio Medeiros
+github_username: helmedeiros
+markdown: kramdown
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

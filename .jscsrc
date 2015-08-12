@@ -1,0 +1,11 @@
+{
+  "validateIndentation": 2,
+  "validateQuoteMarks": "'",
+  "disallowMultipleSpaces": true,
+  "disallowTrailingWhitespace": true,
+  "disallowMixedSpacesAndTabs": true,
+  "requireCurlyBraces": ["if", "else", "for", "while", "do", "switch", "try", "catch"],
+  "requireSpaceAfterKeywords": ["if", "else", "for", "while", "do", "switch", "return", "try", "catch", "function"],
+  "requireSemicolons": true,
+  "maximumLineLength": 100
+}

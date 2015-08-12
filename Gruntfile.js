@@ -25,13 +25,24 @@ module.exports = function (grunt) {
       options: {
         config: '.jscsrc'
       }
+    },
+
+    mochaTest: {
+      all: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['test/**/*.spec.js']
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   grunt.registerTask('lint', ['jshint', 'jscs']);
-  grunt.registerTask('default', ['lint']);
-  grunt.registerTask('ci', ['lint']);
+  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('default', ['lint', 'test']);
+  grunt.registerTask('ci', ['lint', 'test']);
 };

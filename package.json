@@ -16,5 +16,12 @@
   "engines": {
     "node": ">=0.12",
     "iojs": ">=2"
+  },
+  "scripts": {
+    "test": "grunt ci"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-cli": "~0.1.13"
   }
 }

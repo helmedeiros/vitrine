@@ -18,7 +18,8 @@
     "iojs": ">=2"
   },
   "scripts": {
-    "test": "grunt ci"
+    "test": "grunt ci",
+    "postinstall": "sh tools/install-hooks.sh"
   },
   "devDependencies": {
     "chai": "~3.2.0",

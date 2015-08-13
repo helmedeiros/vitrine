@@ -1,0 +1,3 @@
+#!/bin/sh
+# Run lint and test gates before each commit.
+exec ./node_modules/.bin/grunt ci

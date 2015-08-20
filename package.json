@@ -27,10 +27,18 @@
     "grunt-cli": "~0.1.13",
     "grunt-contrib-jshint": "~0.11.3",
     "grunt-jscs": "~2.1.0",
+    "grunt-karma": "~0.12.1",
     "grunt-mocha-test": "~0.12.7",
     "jscs": "~2.1.0",
     "jshint": "~2.8.0",
+    "karma": "~0.13.10",
+    "karma-chai": "~0.1.0",
+    "karma-mocha": "~0.2.0",
+    "karma-phantomjs-launcher": "~0.2.1",
+    "karma-sinon": "~1.0.5",
+    "karma-spec-reporter": "0.0.20",
     "mocha": "~2.3.0",
+    "phantomjs": "~1.9.18",
     "sinon": "~1.16.0"
   }
 }

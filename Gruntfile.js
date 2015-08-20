@@ -3,6 +3,7 @@
 module.exports = function (grunt) {
   var sources = [
     'Gruntfile.js',
+    'karma.conf.js',
     'core/**/*.js',
     'runtime/**/*.js',
     'configurator/**/*.js',
@@ -34,15 +35,24 @@ module.exports = function (grunt) {
         },
         src: ['test/**/*.spec.js']
       }
+    },
+
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        singleRun: true
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
   grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('lint', ['jshint', 'jscs']);
   grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('browser', ['karma']);
   grunt.registerTask('default', ['lint', 'test']);
   grunt.registerTask('ci', ['lint', 'test']);
 };

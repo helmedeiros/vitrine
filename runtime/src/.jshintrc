@@ -1,0 +1,7 @@
+{
+  "extends": "../../.jshintrc",
+  "strict": "function",
+  "globals": {
+    "define": false
+  }
+}

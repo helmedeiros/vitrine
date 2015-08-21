@@ -28,12 +28,18 @@ module.exports = function (grunt) {
       }
     },
 
-    mochaTest: {
-      all: {
+    'mocha_istanbul': {
+      coverage: {
+        src: 'test',
         options: {
-          reporter: 'spec'
-        },
-        src: ['test/**/*.spec.js']
+          mask: '**/*.spec.js',
+          coverageFolder: 'coverage',
+          reportFormats: ['text-summary', 'lcov'],
+          check: {
+            statements: 80,
+            branches: 80
+          }
+        }
       }
     },
 
@@ -47,11 +53,11 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-jscs');
-  grunt.loadNpmTasks('grunt-mocha-test');
+  grunt.loadNpmTasks('grunt-mocha-istanbul');
   grunt.loadNpmTasks('grunt-karma');
 
   grunt.registerTask('lint', ['jshint', 'jscs']);
-  grunt.registerTask('test', ['mochaTest']);
+  grunt.registerTask('test', ['mocha_istanbul']);
   grunt.registerTask('browser', ['karma']);
   grunt.registerTask('default', ['lint', 'test']);
   grunt.registerTask('ci', ['lint', 'test']);

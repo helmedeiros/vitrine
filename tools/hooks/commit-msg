@@ -1,16 +1,10 @@
 #!/bin/sh
-# Enforce Angular `type(scope): subject` commit message format.
-#
-# Allowed types: feat, fix, docs, style, refactor, perf, test, chore,
-# build, ci, revert. Scope is optional, lowercase letters/digits/dashes.
-# Subject must start with a lowercase letter or digit and be <= 72 chars.
-
 msg_file="$1"
 first_line=$(head -1 "$msg_file")
 
-regex='^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\([a-z0-9-]+\))?: [a-z0-9].{0,71}$'
+angular_subject='^(feat|fix|docs|style|refactor|perf|test|chore|build|ci|revert)(\([a-z0-9-]+\))?: [a-z0-9].{0,71}$'
 
-if ! echo "$first_line" | grep -qE "$regex"; then
+if ! echo "$first_line" | grep -qE "$angular_subject"; then
   echo "" >&2
   echo "Commit message must match: type(scope): subject" >&2
   echo "  - allowed types: feat, fix, docs, style, refactor, perf," >&2

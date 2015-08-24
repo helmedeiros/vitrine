@@ -1,21 +1,20 @@
 #!/bin/sh
-# Installs project git hooks into the local .git/hooks/ directory.
-# Idempotent; run after every `npm install` to keep hooks in sync.
-
 set -e
 
-DIR="$(cd "$(dirname "$0")"; pwd)"
-HOOKS_DIR="$DIR/hooks"
-TARGET="$(git rev-parse --git-dir 2>/dev/null)/hooks"
+source_dir="$(cd "$(dirname "$0")"; pwd)/hooks"
+target_dir="$(git rev-parse --git-dir 2>/dev/null)/hooks"
 
-if [ -z "$TARGET" ] || [ ! -d "$TARGET" ]; then
-  # Not a git checkout (e.g. installed as an npm dependency). Skip.
+not_in_a_git_checkout() {
+  [ -z "$target_dir" ] || [ ! -d "$target_dir" ]
+}
+
+if not_in_a_git_checkout; then
   exit 0
 fi
 
 for hook in pre-commit commit-msg; do
-  cp "$HOOKS_DIR/$hook" "$TARGET/$hook"
-  chmod +x "$TARGET/$hook"
+  cp "$source_dir/$hook" "$target_dir/$hook"
+  chmod +x "$target_dir/$hook"
 done
 
-echo "git hooks installed into $TARGET"
+echo "git hooks installed into $target_dir"

@@ -35,6 +35,7 @@ module.exports = function (grunt) {
           mask: '**/*.spec.js',
           coverageFolder: 'coverage',
           reportFormats: ['text-summary', 'lcov'],
+          excludes: ['runtime/src/index.js'],
           check: {
             statements: 80,
             branches: 80

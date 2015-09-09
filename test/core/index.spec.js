@@ -28,4 +28,29 @@ describe('core module', function () {
     expect(core.Mask).to.be.a('function');
     expect(new core.Mask(1, 1).coverage()).to.equal(0);
   });
+
+  it('exposes the Url value object', function () {
+    expect(core.Url).to.be.a('function');
+    expect(new core.Url('http://example.com/').normalised).to.equal('http://example.com/');
+  });
+
+  it('exposes the DimensionsAndStem identity signal', function () {
+    expect(core.DimensionsAndStem).to.be.a('function');
+    expect(new core.DimensionsAndStem(100, 200, 'a').filenameStem).to.equal('a');
+  });
+
+  it('exposes the PerceptualHash identity signal', function () {
+    expect(core.PerceptualHash).to.be.a('function');
+    expect(new core.PerceptualHash('ff').bits).to.equal(8);
+  });
+
+  it('exposes the SelectorPath identity signal', function () {
+    expect(core.SelectorPath).to.be.a('function');
+    expect(new core.SelectorPath(['body']).depth).to.equal(1);
+  });
+
+  it('exposes the ImageIdentity aggregate', function () {
+    expect(core.ImageIdentity).to.be.a('function');
+    expect(new core.ImageIdentity({}).has('url')).to.equal(false);
+  });
 });

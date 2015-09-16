@@ -53,4 +53,10 @@ describe('core module', function () {
     expect(core.ImageIdentity).to.be.a('function');
     expect(new core.ImageIdentity({}).has('url')).to.equal(false);
   });
+
+  it('exposes the matchIdentities cascade function', function () {
+    expect(core.matchIdentities).to.be.a('function');
+    var empty = new core.ImageIdentity({});
+    expect(core.matchIdentities(empty, empty).matched).to.equal(false);
+  });
 });

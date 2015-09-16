@@ -9,5 +9,6 @@ module.exports = {
   DimensionsAndStem: require('./dimensions-and-stem'),
   PerceptualHash: require('./perceptual-hash'),
   SelectorPath: require('./selector-path'),
-  ImageIdentity: require('./image-identity')
+  ImageIdentity: require('./image-identity'),
+  matchIdentities: require('./match-cascade')
 };

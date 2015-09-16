@@ -11,5 +11,6 @@ module.exports = {
   SelectorPath: require('./selector-path'),
   ImageIdentity: require('./image-identity'),
   matchIdentities: require('./match-cascade'),
-  resolveLink: require('./link-resolver')
+  resolveLink: require('./link-resolver'),
+  Funnel: require('./funnel')
 };

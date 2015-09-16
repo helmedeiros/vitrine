@@ -65,4 +65,9 @@ describe('core module', function () {
     var resolved = core.resolveLink({kind: 'manual', url: 'http://example.com/'});
     expect(resolved.url).to.equal('http://example.com/');
   });
+
+  it('exposes the Funnel state machine', function () {
+    expect(core.Funnel).to.be.a('function');
+    expect(new core.Funnel().state).to.equal('initial');
+  });
 });

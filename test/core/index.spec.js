@@ -59,4 +59,10 @@ describe('core module', function () {
     var empty = new core.ImageIdentity({});
     expect(core.matchIdentities(empty, empty).matched).to.equal(false);
   });
+
+  it('exposes the resolveLink function', function () {
+    expect(core.resolveLink).to.be.a('function');
+    var resolved = core.resolveLink({kind: 'manual', url: 'http://example.com/'});
+    expect(resolved.url).to.equal('http://example.com/');
+  });
 });

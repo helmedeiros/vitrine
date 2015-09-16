@@ -10,5 +10,6 @@ module.exports = {
   PerceptualHash: require('./perceptual-hash'),
   SelectorPath: require('./selector-path'),
   ImageIdentity: require('./image-identity'),
-  matchIdentities: require('./match-cascade')
+  matchIdentities: require('./match-cascade'),
+  resolveLink: require('./link-resolver')
 };

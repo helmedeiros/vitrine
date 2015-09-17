@@ -16,5 +16,6 @@ module.exports = {
   resolveLink: require('./link-resolver'),
   Funnel: require('./funnel'),
   DomainError: errors.DomainError,
-  ValidationError: errors.ValidationError
+  ValidationError: errors.ValidationError,
+  Brand: require('./brand')
 };

@@ -80,4 +80,10 @@ describe('core module', function () {
     expect(core.ValidationError).to.be.a('function');
     expect(new core.ValidationError('x', 'field')).to.be.instanceof(core.DomainError);
   });
+
+  it('exposes the Brand entity', function () {
+    expect(core.Brand).to.be.a('function');
+    var b = new core.Brand({key: 'asos', name: 'ASOS', adapterKey: 'rest'});
+    expect(b.key).to.equal('asos');
+  });
 });

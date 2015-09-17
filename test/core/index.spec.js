@@ -70,4 +70,14 @@ describe('core module', function () {
     expect(core.Funnel).to.be.a('function');
     expect(new core.Funnel().state).to.equal('initial');
   });
+
+  it('exposes the DomainError type', function () {
+    expect(core.DomainError).to.be.a('function');
+    expect(new core.DomainError('x')).to.be.instanceof(Error);
+  });
+
+  it('exposes the ValidationError type', function () {
+    expect(core.ValidationError).to.be.a('function');
+    expect(new core.ValidationError('x', 'field')).to.be.instanceof(core.DomainError);
+  });
 });

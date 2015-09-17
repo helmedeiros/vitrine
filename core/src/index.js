@@ -1,5 +1,7 @@
 'use strict';
 
+var errors = require('./errors');
+
 module.exports = {
   Point: require('./point'),
   Rect: require('./rect'),
@@ -12,5 +14,7 @@ module.exports = {
   ImageIdentity: require('./image-identity'),
   matchIdentities: require('./match-cascade'),
   resolveLink: require('./link-resolver'),
-  Funnel: require('./funnel')
+  Funnel: require('./funnel'),
+  DomainError: errors.DomainError,
+  ValidationError: errors.ValidationError
 };

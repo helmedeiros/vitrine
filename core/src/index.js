@@ -19,5 +19,6 @@ module.exports = {
   ValidationError: errors.ValidationError,
   Brand: require('./brand'),
   Page: require('./page'),
-  ImageAsset: require('./image-asset')
+  ImageAsset: require('./image-asset'),
+  Region: require('./region')
 };

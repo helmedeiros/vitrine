@@ -103,4 +103,14 @@ describe('core module', function () {
     });
     expect(a.id).to.equal('img-1');
   });
+
+  it('exposes the Region entity', function () {
+    expect(core.Region).to.be.a('function');
+    var r = new core.Region({
+      id: 'r1',
+      imageAssetId: 'img-1',
+      geometry: new core.Rect(0, 0, 10, 10)
+    });
+    expect(r.geometryKind).to.equal('rect');
+  });
 });

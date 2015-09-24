@@ -113,4 +113,10 @@ describe('core module', function () {
     });
     expect(r.geometryKind).to.equal('rect');
   });
+
+  it('exposes the ProductBinding entity', function () {
+    expect(core.ProductBinding).to.be.a('function');
+    var b = new core.ProductBinding({regionId: 'r1', kind: 'manual', url: 'http://x/'});
+    expect(b.regionId).to.equal('r1');
+  });
 });

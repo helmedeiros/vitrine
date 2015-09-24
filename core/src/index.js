@@ -20,5 +20,6 @@ module.exports = {
   Brand: require('./brand'),
   Page: require('./page'),
   ImageAsset: require('./image-asset'),
-  Region: require('./region')
+  Region: require('./region'),
+  ProductBinding: require('./product-binding')
 };

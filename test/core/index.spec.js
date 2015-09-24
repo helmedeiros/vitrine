@@ -92,4 +92,15 @@ describe('core module', function () {
     var p = new core.Page({url: new core.Url('http://example.com/'), ingestedAt: 1});
     expect(p.ingestedAt).to.equal(1);
   });
+
+  it('exposes the ImageAsset entity', function () {
+    expect(core.ImageAsset).to.be.a('function');
+    var a = new core.ImageAsset({
+      id: 'img-1',
+      identity: new core.ImageIdentity({}),
+      renderedWidth: 100,
+      renderedHeight: 100
+    });
+    expect(a.id).to.equal('img-1');
+  });
 });

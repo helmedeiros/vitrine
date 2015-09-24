@@ -17,5 +17,6 @@ module.exports = {
   Funnel: require('./funnel'),
   DomainError: errors.DomainError,
   ValidationError: errors.ValidationError,
-  Brand: require('./brand')
+  Brand: require('./brand'),
+  Page: require('./page')
 };

@@ -86,4 +86,10 @@ describe('core module', function () {
     var b = new core.Brand({key: 'asos', name: 'ASOS', adapterKey: 'rest'});
     expect(b.key).to.equal('asos');
   });
+
+  it('exposes the Page entity', function () {
+    expect(core.Page).to.be.a('function');
+    var p = new core.Page({url: new core.Url('http://example.com/'), ingestedAt: 1});
+    expect(p.ingestedAt).to.equal(1);
+  });
 });

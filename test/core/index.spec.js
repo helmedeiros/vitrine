@@ -119,4 +119,17 @@ describe('core module', function () {
     var b = new core.ProductBinding({regionId: 'r1', kind: 'manual', url: 'http://x/'});
     expect(b.regionId).to.equal('r1');
   });
+
+  it('exposes the Artifact entity', function () {
+    expect(core.Artifact).to.be.a('function');
+    var a = new core.Artifact({
+      pageUrl: new core.Url('http://example.com/'),
+      version: 'v1',
+      imageAssets: [],
+      regions: [],
+      bindings: [],
+      createdAt: 1
+    });
+    expect(a.version).to.equal('v1');
+  });
 });

@@ -132,4 +132,8 @@ describe('core module', function () {
     });
     expect(a.version).to.equal('v1');
   });
+
+  it('exposes the ingestPage use case', function () {
+    expect(core.ingestPage).to.be.a('function');
+  });
 });

@@ -22,5 +22,6 @@ module.exports = {
   ImageAsset: require('./image-asset'),
   Region: require('./region'),
   ProductBinding: require('./product-binding'),
-  Artifact: require('./artifact')
+  Artifact: require('./artifact'),
+  ingestPage: require('./ingest-page')
 };

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Looksy &mdash; Discover &amp; Share</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      background: #fafafa;
+      color: #262626;
+      line-height: 1.45;
+    }
+    .top-bar {
+      background: #ffffff;
+      border-bottom: 1px solid #dbdbdb;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+    }
+    .brand {
+      margin: 0;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 1.6rem;
+      color: #262626;
+    }
+    .search {
+      width: 240px;
+      padding: 0.4rem 0.75rem;
+      background: #f0f0f0;
+      border: 1px solid #efefef;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .top-nav a {
+      color: #262626;
+      text-decoration: none;
+      margin-left: 1.25rem;
+      font-size: 0.9rem;
+    }
+    .layout {
+      max-width: 940px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+    }
+    .stories {
+      background: #ffffff;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
+      padding: 1rem;
+      display: flex;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+    }
+    .story {
+      flex: 0 0 auto;
+      margin-right: 1rem;
+      text-align: center;
+      width: 64px;
+    }
+    .story img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #e95950;
+      padding: 2px;
+      display: block;
+      margin: 0 auto;
+    }
+    .story span {
+      display: block;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      color: #555;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .post {
+      background: #ffffff;
+      border: 1px solid #dbdbdb;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+    }
+    .post-header img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      margin-right: 0.75rem;
+    }
+    .post-header .who {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .post-header .where {
+      display: block;
+      font-size: 0.78rem;
+      color: #8e8e8e;
+      font-weight: normal;
+    }
+    .post-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .post-body {
+      padding: 0.75rem 1rem 1rem;
+    }
+    .post-body .likes {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin: 0 0 0.4rem;
+    }
+    .post-body .caption {
+      font-size: 0.92rem;
+      margin: 0 0 0.4rem;
+    }
+    .post-body .caption strong {
+      margin-right: 0.4rem;
+    }
+    .post-body .meta {
+      font-size: 0.75rem;
+      color: #8e8e8e;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <h1 class="brand">Looksy</h1>
+    <input class="search" type="text" placeholder="Search">
+    <nav class="top-nav">
+      <a href="#feed">Feed</a>
+      <a href="#explore">Explore</a>
+      <a href="#me">Profile</a>
+    </nav>
+  </div>
+
+  <div class="layout">
+    <section class="stories">
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/e95950/ffffff?text=A" alt="alex">
+        <span>alex</span>
+      </div>
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/4a90e2/ffffff?text=M" alt="mila">
+        <span>mila</span>
+      </div>
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/7ed321/ffffff?text=J" alt="june">
+        <span>june</span>
+      </div>
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/f5a623/ffffff?text=K" alt="kai">
+        <span>kai</span>
+      </div>
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/9013fe/ffffff?text=S" alt="sora">
+        <span>sora</span>
+      </div>
+      <div class="story">
+        <img src="https://via.placeholder.com/120x120/50e3c2/ffffff?text=R" alt="remy">
+        <span>remy</span>
+      </div>
+    </section>
+
+    <article class="post">
+      <header class="post-header">
+        <img src="https://via.placeholder.com/120x120/e95950/ffffff?text=A" alt="alex">
+        <div>
+          <span class="who">alex</span>
+          <span class="where">Lisbon, Portugal</span>
+        </div>
+      </header>
+      <div class="post-image">
+        <img src="https://via.placeholder.com/900x900/c9b87a/333333?text=Outfit+of+the+Day"
+             alt="Outfit of the day">
+      </div>
+      <div class="post-body">
+        <p class="likes">2,418 likes</p>
+        <p class="caption">
+          <strong>alex</strong>denim jacket from @atelier &middot; sneakers from @pacestudio
+        </p>
+        <p class="meta">2 hours ago</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-header">
+        <img src="https://via.placeholder.com/120x120/4a90e2/ffffff?text=M" alt="mila">
+        <div>
+          <span class="who">mila</span>
+          <span class="where">Mexico City</span>
+        </div>
+      </header>
+      <div class="post-image">
+        <img src="https://via.placeholder.com/900x900/d9b35b/3a2a1a?text=Sunday+Brunch"
+             alt="Sunday Brunch">
+      </div>
+      <div class="post-body">
+        <p class="likes">1,802 likes</p>
+        <p class="caption">
+          <strong>mila</strong>brunch with friends &middot; ceramic plates by @clay.studio
+        </p>
+        <p class="meta">5 hours ago</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-header">
+        <img src="https://via.placeholder.com/120x120/7ed321/ffffff?text=J" alt="june">
+        <div>
+          <span class="who">june</span>
+          <span class="where">Portland, OR</span>
+        </div>
+      </header>
+      <div class="post-image">
+        <img src="https://via.placeholder.com/900x900/7a8f6a/ffffff?text=Garden+Update"
+             alt="Garden update">
+      </div>
+      <div class="post-body">
+        <p class="likes">934 likes</p>
+        <p class="caption">
+          <strong>june</strong>brass shears from @folioandtwine &middot; seeds from @localseeds
+        </p>
+        <p class="meta">1 day ago</p>
+      </div>
+    </article>
+
+    <article class="post">
+      <header class="post-header">
+        <img src="https://via.placeholder.com/120x120/f5a623/ffffff?text=K" alt="kai">
+        <div>
+          <span class="who">kai</span>
+          <span class="where">Tokyo</span>
+        </div>
+      </header>
+      <div class="post-image">
+        <img src="https://via.placeholder.com/900x900/2a3a4a/ffffff?text=Night+Run"
+             alt="Night run">
+      </div>
+      <div class="post-body">
+        <p class="likes">3,120 likes</p>
+        <p class="caption">
+          <strong>kai</strong>running shoes by @pacestudio &middot; jacket by @atelier
+        </p>
+        <p class="meta">2 days ago</p>
+      </div>
+    </article>
+  </div>
+</body>
+</html>

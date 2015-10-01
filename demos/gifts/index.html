@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Folio &amp; Twine &mdash; Curated Gift Shop</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      color: #3a2f2a;
+      background: #fbf6ef;
+      line-height: 1.55;
+    }
+    .site-header {
+      background: #fbf6ef;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ead7c4;
+    }
+    .site-title {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-weight: normal;
+      font-style: italic;
+      font-size: 1.5rem;
+      color: #8a4a3a;
+      letter-spacing: 0.03em;
+    }
+    .site-nav a {
+      color: #6a4a3a;
+      text-decoration: none;
+      margin-left: 2rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+    }
+    .intro {
+      max-width: 720px;
+      margin: 3.5rem auto 2rem;
+      padding: 0 1.5rem;
+      text-align: center;
+    }
+    .intro h2 {
+      font-family: Georgia, serif;
+      font-weight: normal;
+      font-size: 2.3rem;
+      color: #8a4a3a;
+      margin: 0 0 0.75rem;
+      letter-spacing: 0.02em;
+    }
+    .intro p {
+      color: #6a5a4a;
+      font-size: 1.05rem;
+      margin: 0;
+    }
+    .gift-grid {
+      max-width: 1100px;
+      margin: 2rem auto 3rem;
+      padding: 0 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .gift {
+      flex: 1 1 240px;
+      max-width: 320px;
+      margin: 0 1rem 2.5rem;
+      background: #fff;
+      padding: 1rem;
+      box-shadow: 0 2px 6px rgba(60, 40, 20, 0.06);
+    }
+    .gift img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .gift h3 {
+      font-family: Georgia, serif;
+      font-weight: normal;
+      font-size: 1.2rem;
+      margin: 1rem 0 0.25rem;
+      color: #5a3a2a;
+    }
+    .gift p {
+      margin: 0;
+      color: #7a6a5a;
+      font-size: 0.92rem;
+    }
+    .gift .price {
+      color: #a87a3a;
+      margin-top: 0.5rem;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+    }
+    .themed {
+      background: #f0e2d0;
+      padding: 3rem 1rem;
+      text-align: center;
+    }
+    .themed h2 {
+      font-family: Georgia, serif;
+      font-weight: normal;
+      font-size: 1.8rem;
+      color: #8a4a3a;
+      margin: 0 0 2rem;
+    }
+    .themed-row {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .theme {
+      flex: 1 1 280px;
+      max-width: 340px;
+      margin: 0 1rem 1.5rem;
+    }
+    .theme img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+    .theme h3 {
+      font-family: Georgia, serif;
+      font-weight: normal;
+      font-size: 1.15rem;
+      margin: 1rem 0 0;
+      color: #5a3a2a;
+    }
+    .site-footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #8a7a6a;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-title">Folio &amp; Twine</h1>
+    <nav class="site-nav">
+      <a href="#shop">Shop</a>
+      <a href="#themed">Themed Boxes</a>
+      <a href="#custom">Custom</a>
+      <a href="#about">About</a>
+    </nav>
+  </header>
+
+  <section class="intro">
+    <h2>Considered gifts, beautifully wrapped.</h2>
+    <p>Small-batch goods from independent makers, hand-assembled in our studio.</p>
+  </section>
+
+  <section class="gift-grid">
+    <article class="gift">
+      <img src="https://via.placeholder.com/500x400/d4a373/ffffff?text=The+Host"
+           alt="The Host gift box">
+      <h3>The Host</h3>
+      <p>Aged balsamic, hand-thrown olive bowl, linen napkins.</p>
+      <div class="price">$84</div>
+    </article>
+    <article class="gift">
+      <img src="https://via.placeholder.com/500x400/a3754b/ffffff?text=The+Baker"
+           alt="The Baker gift box">
+      <h3>The Baker</h3>
+      <p>Heritage flour, cast-iron loaf pan, leather apron.</p>
+      <div class="price">$96</div>
+    </article>
+    <article class="gift">
+      <img src="https://via.placeholder.com/500x400/7a8f6a/ffffff?text=The+Gardener"
+           alt="The Gardener gift box">
+      <h3>The Gardener</h3>
+      <p>Brass shears, seed library, waxed canvas hat.</p>
+      <div class="price">$110</div>
+    </article>
+    <article class="gift">
+      <img src="https://via.placeholder.com/500x400/8a5a4a/ffffff?text=The+Reader"
+           alt="The Reader gift box">
+      <h3>The Reader</h3>
+      <p>Letterpress bookmark, ceramic mug, chamomile blend.</p>
+      <div class="price">$72</div>
+    </article>
+  </section>
+
+  <section class="themed" id="themed">
+    <h2>Themed boxes for every occasion</h2>
+    <div class="themed-row">
+      <div class="theme">
+        <img src="https://via.placeholder.com/600x420/c98a6a/ffffff?text=Housewarming"
+             alt="Housewarming">
+        <h3>Housewarming</h3>
+      </div>
+      <div class="theme">
+        <img src="https://via.placeholder.com/600x420/8a7050/ffffff?text=Anniversary"
+             alt="Anniversary">
+        <h3>Anniversary</h3>
+      </div>
+      <div class="theme">
+        <img src="https://via.placeholder.com/600x420/a04a3a/ffffff?text=Just+Because"
+             alt="Just Because">
+        <h3>Just Because</h3>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    &copy; 2015 Folio &amp; Twine &middot; Made in Portland
+  </footer>
+</body>
+</html>

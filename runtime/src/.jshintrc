@@ -2,6 +2,8 @@
   "extends": "../../.jshintrc",
   "strict": "function",
   "globals": {
-    "define": false
+    "define": false,
+    "escape": false,
+    "unescape": false
   }
 }

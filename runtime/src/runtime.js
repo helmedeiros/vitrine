@@ -1,6 +1,8 @@
 'use strict';
 
 var scanImages = require('./image-scanner');
+var adminHandoff = require('./admin-handoff');
+var discoveryPanel = require('./discovery-panel');
 
 function detectMode(globalConfig) {
   if (globalConfig === null || globalConfig === undefined) {
@@ -20,5 +22,9 @@ module.exports = {
   version: '0.0.0',
   detectMode: detectMode,
   boot: boot,
-  scanImages: scanImages
+  scanImages: scanImages,
+  buildAdminUrl: adminHandoff.buildAdminUrl,
+  encodePayload: adminHandoff.encodePayload,
+  mountDiscoveryPanel: discoveryPanel.mountPanel,
+  buildDiscoveryPanel: discoveryPanel.buildPanel
 };

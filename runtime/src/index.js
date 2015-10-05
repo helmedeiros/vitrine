@@ -2,16 +2,14 @@
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
-    define([], factory);
+    define(['./runtime'], factory);
   } else if (typeof module === 'object' && module.exports) {
-    module.exports = factory();
+    module.exports = factory(require('./runtime'));
   } else {
-    root.vitrine = factory();
+    root.vitrine = factory(root.vitrineRuntime);
   }
-}(this, function () {
+}(this, function (runtime) {
   'use strict';
 
-  return {
-    version: '0.0.0'
-  };
+  return runtime;
 }));

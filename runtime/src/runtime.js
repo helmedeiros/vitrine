@@ -1,5 +1,7 @@
 'use strict';
 
+var scanImages = require('./image-scanner');
+
 function detectMode(globalConfig) {
   if (globalConfig === null || globalConfig === undefined) {
     return 'discovery';
@@ -17,5 +19,6 @@ function boot(globalConfig) {
 module.exports = {
   version: '0.0.0',
   detectMode: detectMode,
-  boot: boot
+  boot: boot,
+  scanImages: scanImages
 };

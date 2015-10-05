@@ -37,4 +37,8 @@ describe('runtime entry', function () {
       expect(vitrine.boot({images: []}).mode).to.equal('config');
     });
   });
+
+  it('exposes scanImages', function () {
+    expect(vitrine.scanImages).to.be.a('function');
+  });
 });

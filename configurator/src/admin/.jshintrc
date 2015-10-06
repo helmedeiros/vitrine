@@ -1,0 +1,7 @@
+{
+  "extends": "../../../.jshintrc",
+  "globals": {
+    "escape": false,
+    "atob": false
+  }
+}

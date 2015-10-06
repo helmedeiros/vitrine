@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vitrine &mdash; Admin</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      margin: 0;
+      background: #f7f7f4;
+      color: #2a2a2a;
+      line-height: 1.5;
+    }
+    header {
+      background: #1f1f1f;
+      color: #ffffff;
+      padding: 1.25rem 1.5rem;
+    }
+    header h1 {
+      margin: 0;
+      font-weight: 300;
+      font-size: 1.4rem;
+      letter-spacing: 0.05em;
+    }
+    .layout {
+      max-width: 960px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+    .empty-state {
+      padding: 2rem;
+      background: #ffffff;
+      border: 1px solid #e2e2e2;
+      border-radius: 4px;
+      text-align: center;
+      color: #666;
+    }
+    .empty-state code {
+      background: #f0f0f0;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.92em;
+    }
+    #vitrine-image-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #vitrine-image-list li {
+      background: #ffffff;
+      border: 1px solid #e2e2e2;
+      border-radius: 3px;
+      padding: 0.75rem 1rem;
+      margin-bottom: 0.5rem;
+      font-family: Menlo, Consolas, monospace;
+      font-size: 0.88rem;
+      word-break: break-all;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Vitrine &mdash; Admin</h1>
+  </header>
+
+  <main class="layout">
+    <div class="empty-state">
+      Load this page with <code>#data=&lt;base64&gt;</code> in the URL to import images.
+    </div>
+
+    <ul id="vitrine-image-list"></ul>
+  </main>
+
+  <script src="admin-shell.js"></script>
+  <script src="admin-bootstrap.js"></script>
+</body>
+</html>

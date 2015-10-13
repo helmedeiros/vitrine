@@ -53,7 +53,7 @@ module.exports = function (grunt) {
 
     browserify: {
       runtime: {
-        src: ['runtime/src/runtime.js'],
+        src: ['runtime/src/auto-start.js'],
         dest: 'runtime/dist/runtime.js',
         options: {
           browserifyOptions: {

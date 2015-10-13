@@ -3,6 +3,8 @@ npm-debug.log
 .npm/
 coverage/
 .grunt/
+runtime/dist/
+package-lock.json
 *.swp
 *.swo
 .DS_Store

@@ -5,7 +5,7 @@ module.exports = function (grunt) {
     'Gruntfile.js',
     'karma.conf.js',
     'core/**/*.js',
-    'runtime/**/*.js',
+    'runtime/src/**/*.js',
     'configurator/**/*.js',
     'adapters/**/*.js',
     'test/**/*.js'
@@ -49,6 +49,18 @@ module.exports = function (grunt) {
         configFile: 'karma.conf.js',
         singleRun: true
       }
+    },
+
+    browserify: {
+      runtime: {
+        src: ['runtime/src/runtime.js'],
+        dest: 'runtime/dist/runtime.js',
+        options: {
+          browserifyOptions: {
+            standalone: 'vitrine'
+          }
+        }
+      }
     }
   });
 
@@ -56,10 +68,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-jscs');
   grunt.loadNpmTasks('grunt-mocha-istanbul');
   grunt.loadNpmTasks('grunt-karma');
+  grunt.loadNpmTasks('grunt-browserify');
 
   grunt.registerTask('lint', ['jshint', 'jscs']);
   grunt.registerTask('test', ['mocha_istanbul']);
   grunt.registerTask('browser', ['karma']);
+  grunt.registerTask('bundle', ['browserify']);
   grunt.registerTask('default', ['lint', 'test']);
   grunt.registerTask('ci', ['lint', 'test']);
 };

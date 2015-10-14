@@ -1804,6 +1804,63 @@ module.exports = {
 },{"buffer":2}],6:[function(require,module,exports){
 'use strict';
 
+var runtime = require('./runtime');
+
+var DEFAULT_ADMIN_URL = 'https://helmedeiros.github.io/vitrine/admin/';
+
+function resolveAdminUrl(windowRef, options) {
+  if (options && typeof options.adminUrl === 'string' && options.adminUrl.length > 0) {
+    return options.adminUrl;
+  }
+  if (typeof windowRef.VITRINE_ADMIN_URL === 'string' &&
+      windowRef.VITRINE_ADMIN_URL.length > 0) {
+    return windowRef.VITRINE_ADMIN_URL;
+  }
+  return DEFAULT_ADMIN_URL;
+}
+
+function autoStart(windowRef, documentRef, options) {
+  var mode = runtime.detectMode(windowRef.VITRINE_CONFIG);
+  if (mode !== 'discovery') {
+    return null;
+  }
+  var detected = runtime.scanImages(documentRef);
+  var adminUrl = resolveAdminUrl(windowRef, options);
+  var payloadUrl = runtime.buildAdminUrl(adminUrl, {
+    pageUrl: windowRef.location.href,
+    images: detected
+  });
+  return runtime.mountDiscoveryPanel(documentRef, {
+    imageCount: detected.length,
+    adminUrl: payloadUrl
+  });
+}
+
+function isBrowserContext() {
+  return typeof window !== 'undefined' && typeof document !== 'undefined';
+}
+
+function bindToBrowser() {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      autoStart(window, document);
+    });
+  } else {
+    autoStart(window, document);
+  }
+}
+
+if (isBrowserContext()) {
+  bindToBrowser();
+}
+
+module.exports = {
+  autoStart: autoStart
+};
+
+},{"./runtime":9}],7:[function(require,module,exports){
+'use strict';
+
 var PANEL_STYLES = [
   'position:fixed', 'top:12px', 'right:12px',
   'background:#1f1f1f', 'color:#ffffff',
@@ -1877,7 +1934,7 @@ module.exports = {
   mountPanel: mountPanel
 };
 
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 function validateDocument(documentRef) {
@@ -1915,7 +1972,7 @@ function scanImages(documentRef) {
 
 module.exports = scanImages;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var scanImages = require('./image-scanner');
@@ -1947,5 +2004,5 @@ module.exports = {
   buildDiscoveryPanel: discoveryPanel.buildPanel
 };
 
-},{"./admin-handoff":5,"./discovery-panel":6,"./image-scanner":7}]},{},[8])(8)
+},{"./admin-handoff":5,"./discovery-panel":7,"./image-scanner":8}]},{},[6])(6)
 });

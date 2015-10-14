@@ -10,16 +10,21 @@ function encodeUtf8ToBase64(jsonString) {
   return btoa(unescape(encodeURIComponent(jsonString)));
 }
 
-function fakeListElement() {
+function fakeElement(tagName) {
   return {
-    tagName: 'UL',
+    tagName: tagName.toUpperCase(),
     children: [],
-    appendChild: function (child) { this.children.push(child); }
+    textContent: '',
+    src: '',
+    className: '',
+    style: {},
+    appendChild: function (child) { this.children.push(child); },
+    setAttribute: function (name, value) { this[name] = value; }
   };
 }
 
-function fakeItemElement() {
-  return {tagName: 'LI', textContent: ''};
+function fakeListElement() {
+  return fakeElement('ul');
 }
 
 function fakeDocument(listElement) {
@@ -28,10 +33,7 @@ function fakeDocument(listElement) {
       return id === 'vitrine-image-list' ? listElement : null;
     },
     createElement: function (tagName) {
-      if (tagName === 'li') {
-        return fakeItemElement();
-      }
-      return null;
+      return fakeElement(tagName);
     }
   };
 }
@@ -93,15 +95,31 @@ describe('decodePayload', function () {
 });
 
 describe('renderImageList', function () {
-  it('appends one <li> per image in the payload', function () {
+  it('appends one image card per payload image', function () {
     var list = fakeListElement();
     var count = adminShell.renderImageList(fakeDocument(list), {
       images: [{src: 'http://a/1.jpg'}, {src: 'http://a/2.jpg'}]
     });
     expect(count).to.equal(2);
     expect(list.children).to.have.length(2);
-    expect(list.children[0].textContent).to.equal('http://a/1.jpg');
-    expect(list.children[1].textContent).to.equal('http://a/2.jpg');
+  });
+
+  it('builds a card with an image thumbnail and the URL as caption', function () {
+    var list = fakeListElement();
+    adminShell.renderImageList(fakeDocument(list), {
+      images: [{src: 'http://example.com/photo.jpg'}]
+    });
+    var card = list.children[0];
+    expect(card.tagName).to.equal('LI');
+    expect(card.className).to.contain('vitrine-image-card');
+    var thumb = card.children[0];
+    expect(thumb.tagName).to.equal('IMG');
+    expect(thumb.src).to.equal('http://example.com/photo.jpg');
+    expect(thumb.className).to.contain('vitrine-image-thumb');
+    var caption = card.children[1];
+    expect(caption.tagName).to.equal('SPAN');
+    expect(caption.textContent).to.equal('http://example.com/photo.jpg');
+    expect(caption.className).to.contain('vitrine-image-url');
   });
 
   it('returns 0 and does nothing when the container is missing', function () {
@@ -123,7 +141,7 @@ describe('renderImageList', function () {
     var list = fakeListElement();
     var documentRef = {
       getElementById: function (id) { return id === 'my-list' ? list : null; },
-      createElement: function () { return fakeItemElement(); }
+      createElement: function (tagName) { return fakeElement(tagName); }
     };
     var count = adminShell.renderImageList(documentRef,
       {images: [{src: 'a'}]}, {containerId: 'my-list'});

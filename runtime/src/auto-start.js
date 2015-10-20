@@ -50,6 +50,13 @@ if (isBrowserContext()) {
   bindToBrowser();
 }
 
-module.exports = {
-  autoStart: autoStart
-};
+var exported = {};
+var key;
+for (key in runtime) {
+  if (runtime.hasOwnProperty(key)) {
+    exported[key] = runtime[key];
+  }
+}
+exported.autoStart = autoStart;
+
+module.exports = exported;

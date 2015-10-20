@@ -75,5 +75,5 @@ module.exports = function (grunt) {
   grunt.registerTask('browser', ['karma']);
   grunt.registerTask('bundle', ['browserify']);
   grunt.registerTask('default', ['lint', 'test']);
-  grunt.registerTask('ci', ['lint', 'test']);
+  grunt.registerTask('ci', ['lint', 'bundle', 'test']);
 };

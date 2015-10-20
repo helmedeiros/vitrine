@@ -56,6 +56,7 @@ function buildPanel(documentRef, options) {
   validateDocument(documentRef);
   validateOptions(options);
   var container = documentRef.createElement('div');
+  container.setAttribute('data-vitrine', 'discovery-panel');
   container.style.cssText = PANEL_STYLES;
   container.appendChild(buildLabel(documentRef, options.imageCount));
   container.appendChild(buildButton(documentRef, options.adminUrl));

@@ -33,6 +33,7 @@
     "grunt-mocha-istanbul": "~3.0.1",
     "istanbul": "~0.3.18",
     "jscs": "~2.1.0",
+    "jsdom": "6.5.1",
     "jshint": "~2.8.0",
     "karma": "~0.13.10",
     "karma-chai": "~0.1.0",

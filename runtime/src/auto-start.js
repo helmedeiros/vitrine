@@ -36,14 +36,18 @@ function isBrowserContext() {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
-function bindToBrowser() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      autoStart(window, document);
-    });
-  } else {
-    autoStart(window, document);
+function bind(windowRef, documentRef, options) {
+  if (documentRef.readyState === 'complete') {
+    return autoStart(windowRef, documentRef, options);
   }
+  windowRef.addEventListener('load', function () {
+    autoStart(windowRef, documentRef, options);
+  });
+  return null;
+}
+
+function bindToBrowser() {
+  bind(window, document);
 }
 
 if (isBrowserContext()) {
@@ -58,5 +62,6 @@ for (key in runtime) {
   }
 }
 exported.autoStart = autoStart;
+exported.bind = bind;
 
 module.exports = exported;

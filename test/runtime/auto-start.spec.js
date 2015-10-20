@@ -1,7 +1,9 @@
 'use strict';
 
 var expect = require('chai').expect;
-var autoStart = require('../../runtime/src/auto-start').autoStart;
+var autoStartModule = require('../../runtime/src/auto-start');
+var autoStart = autoStartModule.autoStart;
+var bind = autoStartModule.bind;
 
 function fakeBody() {
   return {
@@ -46,9 +48,20 @@ function fakeDocument(imgs, body) {
 }
 
 function fakeWindow(overrides) {
+  var listeners = {};
   var base = {
     VITRINE_CONFIG: undefined,
-    location: {href: 'http://example.com/article'}
+    location: {href: 'http://example.com/article'},
+    addEventListener: function (name, handler) {
+      listeners[name] = listeners[name] || [];
+      listeners[name].push(handler);
+    },
+    fireEvent: function (name) {
+      var bound = listeners[name] || [];
+      for (var i = 0; i < bound.length; i++) {
+        bound[i]();
+      }
+    }
   };
   var key;
   if (overrides) {
@@ -59,6 +72,12 @@ function fakeWindow(overrides) {
     }
   }
   return base;
+}
+
+function fakeDocumentWithReadyState(state, imgs, body) {
+  var doc = fakeDocument(imgs, body);
+  doc.readyState = state;
+  return doc;
 }
 
 describe('autoStart', function () {
@@ -112,5 +131,51 @@ describe('autoStart', function () {
     var decoded = JSON.parse(new Buffer(encoded, 'base64').toString('utf8'));
     expect(decoded.pageUrl).to.equal('http://host.example.com/page');
     expect(decoded.images).to.have.length(1);
+  });
+});
+
+describe('bind', function () {
+  it('runs autoStart immediately when document is complete', function () {
+    var body = fakeBody();
+    var documentRef = fakeDocumentWithReadyState('complete',
+      [fakeImg('http://x/a.jpg')], body);
+    var win = fakeWindow();
+    var result = bind(win, documentRef);
+    expect(result).to.not.equal(null);
+    expect(body.appended).to.have.length(1);
+  });
+
+  it('defers autoStart until the load event when document is not complete', function () {
+    var body = fakeBody();
+    var documentRef = fakeDocumentWithReadyState('interactive',
+      [fakeImg('http://x/a.jpg')], body);
+    var win = fakeWindow();
+    var result = bind(win, documentRef);
+    expect(result).to.equal(null);
+    expect(body.appended).to.have.length(0);
+    win.fireEvent('load');
+    expect(body.appended).to.have.length(1);
+  });
+
+  it('defers autoStart on the loading state too', function () {
+    var body = fakeBody();
+    var documentRef = fakeDocumentWithReadyState('loading',
+      [fakeImg('http://x/a.jpg')], body);
+    var win = fakeWindow();
+    bind(win, documentRef);
+    expect(body.appended).to.have.length(0);
+    win.fireEvent('load');
+    expect(body.appended).to.have.length(1);
+  });
+
+  it('forwards options through to autoStart on deferred runs', function () {
+    var body = fakeBody();
+    var documentRef = fakeDocumentWithReadyState('interactive',
+      [fakeImg('http://x/a.jpg')], body);
+    var win = fakeWindow();
+    bind(win, documentRef, {adminUrl: 'http://deferred/'});
+    win.fireEvent('load');
+    var button = body.appended[0].children[1];
+    expect(button.href.indexOf('http://deferred/#data=')).to.equal(0);
   });
 });

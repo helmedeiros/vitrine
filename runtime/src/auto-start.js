@@ -36,12 +36,23 @@ function isBrowserContext() {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
+function runSafely(windowRef, documentRef, options) {
+  try {
+    return autoStart(windowRef, documentRef, options);
+  } catch (error) {
+    if (windowRef.console && typeof windowRef.console.error === 'function') {
+      windowRef.console.error('vitrine: auto-start failed:', error && error.message);
+    }
+    return null;
+  }
+}
+
 function bind(windowRef, documentRef, options) {
   if (documentRef.readyState === 'complete') {
-    return autoStart(windowRef, documentRef, options);
+    return runSafely(windowRef, documentRef, options);
   }
   windowRef.addEventListener('load', function () {
-    autoStart(windowRef, documentRef, options);
+    runSafely(windowRef, documentRef, options);
   });
   return null;
 }

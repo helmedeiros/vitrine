@@ -178,4 +178,33 @@ describe('bind', function () {
     var button = body.appended[0].children[1];
     expect(button.href.indexOf('http://deferred/#data=')).to.equal(0);
   });
+
+  it('swallows errors thrown by autoStart and returns null', function () {
+    var brokenDoc = fakeDocumentWithReadyState('complete', [], fakeBody());
+    brokenDoc.createElement = function () {
+      throw new Error('createElement is unavailable');
+    };
+    var logged = [];
+    var win = fakeWindow({console: {error: function () {
+      logged.push(Array.prototype.slice.call(arguments));
+    }}});
+    expect(bind(win, brokenDoc)).to.equal(null);
+    expect(logged).to.have.length(1);
+    expect(logged[0][0]).to.contain('auto-start failed');
+  });
+
+  it('survives errors raised inside the deferred load handler', function () {
+    var brokenDoc = fakeDocumentWithReadyState('interactive', [], fakeBody());
+    brokenDoc.createElement = function () { throw new Error('boom'); };
+    var win = fakeWindow({console: {error: function () { return; }}});
+    bind(win, brokenDoc);
+    expect(function () { win.fireEvent('load'); }).to.not.throw();
+  });
+
+  it('does not require a console when an error happens', function () {
+    var brokenDoc = fakeDocumentWithReadyState('complete', [], fakeBody());
+    brokenDoc.createElement = function () { throw new Error('boom'); };
+    var win = fakeWindow();
+    expect(function () { bind(win, brokenDoc); }).to.not.throw();
+  });
 });

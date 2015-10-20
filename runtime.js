@@ -1840,23 +1840,46 @@ function isBrowserContext() {
   return typeof window !== 'undefined' && typeof document !== 'undefined';
 }
 
-function bindToBrowser() {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () {
-      autoStart(window, document);
-    });
-  } else {
-    autoStart(window, document);
+function runSafely(windowRef, documentRef, options) {
+  try {
+    return autoStart(windowRef, documentRef, options);
+  } catch (error) {
+    if (windowRef.console && typeof windowRef.console.error === 'function') {
+      windowRef.console.error('vitrine: auto-start failed:', error && error.message);
+    }
+    return null;
   }
+}
+
+function bind(windowRef, documentRef, options) {
+  if (documentRef.readyState === 'complete') {
+    return runSafely(windowRef, documentRef, options);
+  }
+  windowRef.addEventListener('load', function () {
+    runSafely(windowRef, documentRef, options);
+  });
+  return null;
+}
+
+function bindToBrowser() {
+  bind(window, document);
 }
 
 if (isBrowserContext()) {
   bindToBrowser();
 }
 
-module.exports = {
-  autoStart: autoStart
-};
+var exported = {};
+var key;
+for (key in runtime) {
+  if (runtime.hasOwnProperty(key)) {
+    exported[key] = runtime[key];
+  }
+}
+exported.autoStart = autoStart;
+exported.bind = bind;
+
+module.exports = exported;
 
 },{"./runtime":9}],7:[function(require,module,exports){
 'use strict';
@@ -1917,6 +1940,7 @@ function buildPanel(documentRef, options) {
   validateDocument(documentRef);
   validateOptions(options);
   var container = documentRef.createElement('div');
+  container.setAttribute('data-vitrine', 'discovery-panel');
   container.style.cssText = PANEL_STYLES;
   container.appendChild(buildLabel(documentRef, options.imageCount));
   container.appendChild(buildButton(documentRef, options.adminUrl));

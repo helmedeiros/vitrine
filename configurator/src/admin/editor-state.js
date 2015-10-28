@@ -4,19 +4,44 @@ function isNonNegativeInteger(value) {
   return typeof value === 'number' && value >= 0 && value === Math.floor(value);
 }
 
+function isPositiveNumber(value) {
+  return typeof value === 'number' && value > 0;
+}
+
+function isNonNegativeNumber(value) {
+  return typeof value === 'number' && value >= 0;
+}
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function shallowClone(obj) {
+  var result = {};
+  var key;
+  for (key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      result[key] = obj[key];
+    }
+  }
+  return result;
+}
+
 function createEditorState() {
-  return {selectedIndex: null};
+  return {selectedIndex: null, regionsByIndex: {}};
 }
 
 function selectImage(state, index) {
   if (!isNonNegativeInteger(index)) {
     throw new Error('selectImage requires a non-negative integer index');
   }
-  return {selectedIndex: index};
+  var next = shallowClone(state || createEditorState());
+  next.selectedIndex = index;
+  return next;
 }
 
 function clearSelection() {
-  return {selectedIndex: null};
+  return createEditorState();
 }
 
 function getSelectedImage(state, payload) {
@@ -32,9 +57,70 @@ function getSelectedImage(state, payload) {
   return payload.images[state.selectedIndex];
 }
 
+function validateRegion(region) {
+  if (!region || typeof region !== 'object') {
+    throw new Error('addRegion requires a region object');
+  }
+  if (!isNonEmptyString(region.id)) {
+    throw new Error('region requires a non-empty id');
+  }
+  if (!isNonNegativeNumber(region.x) || !isNonNegativeNumber(region.y)) {
+    throw new Error('region requires non-negative x and y');
+  }
+  if (!isPositiveNumber(region.width) || !isPositiveNumber(region.height)) {
+    throw new Error('region requires positive width and height');
+  }
+}
+
+function addRegion(state, imageIndex, region) {
+  if (!isNonNegativeInteger(imageIndex)) {
+    throw new Error('addRegion requires a non-negative integer imageIndex');
+  }
+  validateRegion(region);
+  var current = state || createEditorState();
+  var regionsByIndex = shallowClone(current.regionsByIndex || {});
+  var existing = regionsByIndex[imageIndex] || [];
+  regionsByIndex[imageIndex] = existing.concat([region]);
+  var next = shallowClone(current);
+  next.regionsByIndex = regionsByIndex;
+  return next;
+}
+
+function removeRegion(state, imageIndex, regionId) {
+  var current = state || createEditorState();
+  var existing = (current.regionsByIndex || {})[imageIndex];
+  if (!existing || existing.length === 0) {
+    return current;
+  }
+  var filtered = [];
+  for (var i = 0; i < existing.length; i++) {
+    if (existing[i].id !== regionId) {
+      filtered.push(existing[i]);
+    }
+  }
+  if (filtered.length === existing.length) {
+    return current;
+  }
+  var regionsByIndex = shallowClone(current.regionsByIndex);
+  regionsByIndex[imageIndex] = filtered;
+  var next = shallowClone(current);
+  next.regionsByIndex = regionsByIndex;
+  return next;
+}
+
+function listRegions(state, imageIndex) {
+  if (!state || !state.regionsByIndex) {
+    return [];
+  }
+  return (state.regionsByIndex[imageIndex] || []).slice();
+}
+
 module.exports = {
   createEditorState: createEditorState,
   selectImage: selectImage,
   clearSelection: clearSelection,
-  getSelectedImage: getSelectedImage
+  getSelectedImage: getSelectedImage,
+  addRegion: addRegion,
+  removeRegion: removeRegion,
+  listRegions: listRegions
 };

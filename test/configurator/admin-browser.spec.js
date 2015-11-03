@@ -6,6 +6,8 @@ var expect = require('chai').expect;
 var jsdom = require('jsdom');
 
 var SHELL_PATH = path.resolve(__dirname, '../../configurator/src/admin/admin-shell.js');
+var SELECTION_PATH = path.resolve(__dirname,
+  '../../configurator/src/admin/image-selection.js');
 var BOOTSTRAP_PATH = path.resolve(__dirname,
   '../../configurator/src/admin/admin-bootstrap.js');
 
@@ -32,6 +34,22 @@ describe('admin shell in a browser context', function () {
       }
     });
   });
+
+  it('exposes vitrineImageSelection on window when loaded as a script', function (done) {
+    jsdom.env({
+      html: '<html><body></body></html>',
+      src: [readSource(SELECTION_PATH)],
+      done: function (err, win) {
+        if (err) { done(err); return; }
+        expect(win.vitrineImageSelection).to.be.an('object');
+        expect(win.vitrineImageSelection.attachImageSelectionHandlers)
+          .to.be.a('function');
+        expect(win.vitrineImageSelection.markSelectedCard).to.be.a('function');
+        expect(win.vitrineImageSelection.hideEmptyState).to.be.a('function');
+        done();
+      }
+    });
+  });
 });
 
 describe('admin bootstrap end-to-end in jsdom', function () {
@@ -47,7 +65,8 @@ describe('admin bootstrap end-to-end in jsdom', function () {
       url: 'http://admin/#data=' + encoded,
       html: '<!doctype html><html><body>' +
         '<ul id="vitrine-image-list"></ul></body></html>',
-      src: [readSource(SHELL_PATH), readSource(BOOTSTRAP_PATH)],
+      src: [readSource(SHELL_PATH), readSource(SELECTION_PATH),
+        readSource(BOOTSTRAP_PATH)],
       done: function (err, win) {
         if (err) { done(err); return; }
         var cards = win.document.querySelectorAll('.vitrine-image-card');
@@ -62,7 +81,8 @@ describe('admin bootstrap end-to-end in jsdom', function () {
       url: 'http://admin/',
       html: '<!doctype html><html><body>' +
         '<ul id="vitrine-image-list"></ul></body></html>',
-      src: [readSource(SHELL_PATH), readSource(BOOTSTRAP_PATH)],
+      src: [readSource(SHELL_PATH), readSource(SELECTION_PATH),
+        readSource(BOOTSTRAP_PATH)],
       done: function (err, win) {
         if (err) { done(err); return; }
         var cards = win.document.querySelectorAll('.vitrine-image-card');
@@ -78,7 +98,8 @@ describe('admin bootstrap end-to-end in jsdom', function () {
       url: 'http://admin/#data=' + encoded,
       html: '<!doctype html><html><body>' +
         '<ul id="vitrine-image-list"></ul></body></html>',
-      src: [readSource(SHELL_PATH), readSource(BOOTSTRAP_PATH)],
+      src: [readSource(SHELL_PATH), readSource(SELECTION_PATH),
+        readSource(BOOTSTRAP_PATH)],
       done: function (err, win) {
         if (err) { done(err); return; }
         var card = win.document.querySelector('.vitrine-image-card');
@@ -86,6 +107,48 @@ describe('admin bootstrap end-to-end in jsdom', function () {
         var caption = card.querySelector('.vitrine-image-url');
         expect(thumb.getAttribute('src')).to.equal('http://x.com/photo.jpg');
         expect(caption.textContent).to.equal('http://x.com/photo.jpg');
+        done();
+      }
+    });
+  });
+
+  it('hides the empty-state element after rendering images', function (done) {
+    var encoded = encodePayload({images: [{src: 'http://x.com/a.jpg'}]});
+    jsdom.env({
+      url: 'http://admin/#data=' + encoded,
+      html: '<!doctype html><html><body>' +
+        '<div class="empty-state">load me</div>' +
+        '<ul id="vitrine-image-list"></ul></body></html>',
+      src: [readSource(SHELL_PATH), readSource(SELECTION_PATH),
+        readSource(BOOTSTRAP_PATH)],
+      done: function (err, win) {
+        if (err) { done(err); return; }
+        var emptyState = win.document.querySelector('.empty-state');
+        expect(emptyState.style.display).to.equal('none');
+        done();
+      }
+    });
+  });
+
+  it('marks the selected card when a thumbnail is clicked', function (done) {
+    var encoded = encodePayload({images: [
+      {src: 'http://x/a.jpg'}, {src: 'http://x/b.jpg'}
+    ]});
+    jsdom.env({
+      url: 'http://admin/#data=' + encoded,
+      html: '<!doctype html><html><body>' +
+        '<div class="empty-state">load me</div>' +
+        '<ul id="vitrine-image-list"></ul></body></html>',
+      src: [readSource(SHELL_PATH), readSource(SELECTION_PATH),
+        readSource(BOOTSTRAP_PATH)],
+      done: function (err, win) {
+        if (err) { done(err); return; }
+        var cards = win.document.querySelectorAll('.vitrine-image-card');
+        var clickEvent = win.document.createEvent('MouseEvents');
+        clickEvent.initEvent('click', true, true);
+        cards[1].dispatchEvent(clickEvent);
+        expect(cards[1].classList.contains('vitrine-card-selected')).to.equal(true);
+        expect(cards[0].classList.contains('vitrine-card-selected')).to.equal(false);
         done();
       }
     });

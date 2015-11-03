@@ -58,6 +58,15 @@
       border-radius: 3px;
       padding: 0.5rem;
       text-align: center;
+      cursor: pointer;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .vitrine-image-card:hover {
+      border-color: #b0b0b0;
+    }
+    .vitrine-card-selected {
+      border-color: #e95950;
+      box-shadow: 0 0 0 2px rgba(233, 89, 80, 0.25);
     }
     .vitrine-image-thumb {
       width: 100%;
@@ -91,6 +100,7 @@
   </main>
 
   <script src="admin-shell.js"></script>
+  <script src="image-selection.js"></script>
   <script src="admin-bootstrap.js"></script>
 </body>
 </html>

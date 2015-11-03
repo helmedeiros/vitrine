@@ -57,8 +57,16 @@ function renderImageList(documentRef, payload, options) {
   return payload.images.length;
 }
 
-module.exports = {
+var adminShell = {
   readHashFragment: readHashFragment,
   decodePayload: decodePayload,
   renderImageList: renderImageList
 };
+
+if (typeof module === 'object' && typeof module.exports === 'object') {
+  module.exports = adminShell;
+}
+
+if (typeof window !== 'undefined') {
+  window.vitrineAdminShell = adminShell;
+}

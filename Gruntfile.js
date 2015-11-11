@@ -6,7 +6,7 @@ module.exports = function (grunt) {
     'karma.conf.js',
     'core/**/*.js',
     'runtime/src/**/*.js',
-    'configurator/**/*.js',
+    'configurator/src/**/*.js',
     'adapters/**/*.js',
     'test/**/*.js'
   ];
@@ -58,6 +58,15 @@ module.exports = function (grunt) {
         options: {
           browserifyOptions: {
             standalone: 'vitrine'
+          }
+        }
+      },
+      admin: {
+        src: ['configurator/src/admin/admin.js'],
+        dest: 'configurator/dist/admin.js',
+        options: {
+          browserifyOptions: {
+            standalone: 'vitrineAdmin'
           }
         }
       }

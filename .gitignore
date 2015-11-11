@@ -4,6 +4,7 @@ npm-debug.log
 coverage/
 .grunt/
 runtime/dist/
+configurator/dist/
 package-lock.json
 *.swp
 *.swo

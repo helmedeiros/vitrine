@@ -6,6 +6,7 @@ var view = require('./editor-view');
 var dragHandlers = require('./drag-handlers');
 var state = require('./editor-state');
 var overlays = require('./region-overlays');
+var regionList = require('./region-list');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -23,7 +24,25 @@ function regionFromRect(currentState, rect) {
   };
 }
 
-function buildOnDragEnd(getState, setState, documentRef, overlay) {
+function renderRegionsAndList(documentRef, overlay, currentState, callbacks) {
+  var regions = state.listRegions(currentState, currentState.selectedIndex);
+  overlays.renderRegions(documentRef, overlay, regions);
+  regionList.renderRegionList(documentRef, regions, callbacks);
+}
+
+function buildUrlChangeHandler(getState, setState, documentRef, overlay,
+    regionCallbacks) {
+  return function (regionId, url) {
+    var current = getState();
+    var updated = state.updateRegionUrl(current, current.selectedIndex,
+      regionId, url);
+    setState(updated);
+    renderRegionsAndList(documentRef, overlay, updated, regionCallbacks);
+  };
+}
+
+function buildOnDragEnd(getState, setState, documentRef, overlay,
+    regionCallbacks) {
   return function (rect) {
     var current = getState();
     if (current.selectedIndex === null) {
@@ -32,8 +51,7 @@ function buildOnDragEnd(getState, setState, documentRef, overlay) {
     var region = regionFromRect(current, rect);
     var updated = state.addRegion(current, current.selectedIndex, region);
     setState(updated);
-    overlays.renderRegions(documentRef, overlay,
-      state.listRegions(updated, updated.selectedIndex));
+    renderRegionsAndList(documentRef, overlay, updated, regionCallbacks);
   };
 }
 
@@ -44,11 +62,14 @@ function refreshEditor(documentRef, getState, setState, payload) {
   if (!parts) {
     return;
   }
-  overlays.renderRegions(documentRef, parts.overlay,
-    state.listRegions(current, current.selectedIndex));
+  var regionCallbacks = {};
+  regionCallbacks.onUrlChange = buildUrlChangeHandler(getState, setState,
+    documentRef, parts.overlay, regionCallbacks);
+  renderRegionsAndList(documentRef, parts.overlay, current, regionCallbacks);
   dragHandlers.attachDragHandlers(parts.overlay, {
     minSize: 4,
-    onEnd: buildOnDragEnd(getState, setState, documentRef, parts.overlay)
+    onEnd: buildOnDragEnd(getState, setState, documentRef, parts.overlay,
+      regionCallbacks)
   });
 }
 

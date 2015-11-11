@@ -108,4 +108,35 @@ describe('admin bundle in jsdom', function () {
       done();
     });
   });
+
+  it('renders a region list row with a URL input after a drag', function (done) {
+    var html = '<!doctype html><html><body>' +
+      '<div class="empty-state">load me</div>' +
+      '<ul id="vitrine-image-list"></ul>' +
+      '<div id="vitrine-editor"></div>' +
+      '<div id="vitrine-region-list"></div>' +
+      '</body></html>';
+    withAdminPage([{src: 'http://x/a.jpg'}], html, function (err, win) {
+      if (err) { done(err); return; }
+      var card = win.document.querySelector('.vitrine-image-card');
+      var click = win.document.createEvent('MouseEvents');
+      click.initEvent('click', true, true);
+      card.dispatchEvent(click);
+      var overlay = win.document.querySelector('.vitrine-editor-overlay');
+      function mouseAt(type, x, y) {
+        var event = win.document.createEvent('MouseEvents');
+        event.initMouseEvent(type, true, true, win, 0,
+          0, 0, x, y, false, false, false, false, 0, null);
+        return event;
+      }
+      overlay.dispatchEvent(mouseAt('mousedown', 10, 20));
+      overlay.dispatchEvent(mouseAt('mousemove', 110, 70));
+      overlay.dispatchEvent(mouseAt('mouseup', 110, 70));
+      var rows = win.document.querySelectorAll('.vitrine-region-row');
+      expect(rows).to.have.length(1);
+      var input = rows[0].querySelector('input[type="url"]');
+      expect(input).to.not.equal(null);
+      done();
+    });
+  });
 });

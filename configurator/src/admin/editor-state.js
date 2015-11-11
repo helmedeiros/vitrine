@@ -108,6 +108,34 @@ function removeRegion(state, imageIndex, regionId) {
   return next;
 }
 
+function updateRegionUrl(state, imageIndex, regionId, url) {
+  var current = state || createEditorState();
+  var existing = (current.regionsByIndex || {})[imageIndex];
+  if (!existing || existing.length === 0) {
+    return current;
+  }
+  var found = false;
+  var updated = [];
+  for (var i = 0; i < existing.length; i++) {
+    if (existing[i].id === regionId) {
+      var nextRegion = shallowClone(existing[i]);
+      nextRegion.url = url;
+      updated.push(nextRegion);
+      found = true;
+    } else {
+      updated.push(existing[i]);
+    }
+  }
+  if (!found) {
+    return current;
+  }
+  var regionsByIndex = shallowClone(current.regionsByIndex);
+  regionsByIndex[imageIndex] = updated;
+  var nextState = shallowClone(current);
+  nextState.regionsByIndex = regionsByIndex;
+  return nextState;
+}
+
 function listRegions(state, imageIndex) {
   if (!state || !state.regionsByIndex) {
     return [];
@@ -122,5 +150,6 @@ module.exports = {
   getSelectedImage: getSelectedImage,
   addRegion: addRegion,
   removeRegion: removeRegion,
+  updateRegionUrl: updateRegionUrl,
   listRegions: listRegions
 };

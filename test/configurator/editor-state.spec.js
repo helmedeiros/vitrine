@@ -170,6 +170,39 @@ describe('removeRegion', function () {
   });
 });
 
+describe('updateRegionUrl', function () {
+  it('attaches the url to the named region', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'r1'}));
+    s = editorState.updateRegionUrl(s, 0, 'r1', 'http://shop/p/42');
+    expect(s.regionsByIndex[0][0].url).to.equal('http://shop/p/42');
+  });
+
+  it('leaves other regions on the same image alone', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'r1'}));
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'r2'}));
+    s = editorState.updateRegionUrl(s, 0, 'r2', 'http://shop/p/2');
+    expect(s.regionsByIndex[0][0].url).to.equal(undefined);
+    expect(s.regionsByIndex[0][1].url).to.equal('http://shop/p/2');
+  });
+
+  it('is a no-op when the region is not found', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'r1'}));
+    var same = editorState.updateRegionUrl(s, 0, 'never', 'http://x/');
+    expect(same).to.equal(s);
+  });
+
+  it('does not mutate the prior state', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'r1'}));
+    var before = s.regionsByIndex[0][0];
+    editorState.updateRegionUrl(s, 0, 'r1', 'http://shop/');
+    expect(before.url).to.equal(undefined);
+  });
+});
+
 describe('listRegions', function () {
   it('returns an empty array when no regions exist for the image', function () {
     expect(editorState.listRegions(editorState.createEditorState(), 0))

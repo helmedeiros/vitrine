@@ -109,4 +109,24 @@ describe('renderRegionList', function () {
       ]);
     }).to.not.throw();
   });
+
+  it('renders a remove button per row', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1}]);
+    var button = container.children[0].children[2];
+    expect(button.tagName).to.equal('BUTTON');
+    expect(button.textContent).to.contain('Remove');
+  });
+
+  it('reports remove clicks through the onRemove callback', function () {
+    var container = fakeElement('div');
+    var removed = [];
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1}],
+      {onRemove: function (id) { removed.push(id); }});
+    var button = container.children[0].children[2];
+    button.fire('click');
+    expect(removed).to.deep.equal(['r1']);
+  });
 });

@@ -34,12 +34,25 @@ function buildUrlInput(documentRef, region, callbacks) {
   return input;
 }
 
+function buildRemoveButton(documentRef, region, callbacks) {
+  var button = documentRef.createElement('button');
+  button.textContent = 'Remove';
+  button.className = 'vitrine-region-remove';
+  if (callbacks && callbacks.onRemove) {
+    button.addEventListener('click', function () {
+      callbacks.onRemove(region.id);
+    });
+  }
+  return button;
+}
+
 function buildRegionRow(documentRef, region, callbacks) {
   var row = documentRef.createElement('div');
   row.className = 'vitrine-region-row';
   row.setAttribute('data-region-id', region.id);
   row.appendChild(buildLabel(documentRef, region));
   row.appendChild(buildUrlInput(documentRef, region, callbacks));
+  row.appendChild(buildRemoveButton(documentRef, region, callbacks));
   return row;
 }
 

@@ -139,4 +139,37 @@ describe('admin bundle in jsdom', function () {
       done();
     });
   });
+
+  it('removes the region overlay and row when Remove is clicked', function (done) {
+    var html = '<!doctype html><html><body>' +
+      '<ul id="vitrine-image-list"></ul>' +
+      '<div id="vitrine-editor"></div>' +
+      '<div id="vitrine-region-list"></div>' +
+      '</body></html>';
+    withAdminPage([{src: 'http://x/a.jpg'}], html, function (err, win) {
+      if (err) { done(err); return; }
+      var card = win.document.querySelector('.vitrine-image-card');
+      var click = win.document.createEvent('MouseEvents');
+      click.initEvent('click', true, true);
+      card.dispatchEvent(click);
+      var overlay = win.document.querySelector('.vitrine-editor-overlay');
+      function mouseAt(type, x, y) {
+        var event = win.document.createEvent('MouseEvents');
+        event.initMouseEvent(type, true, true, win, 0,
+          0, 0, x, y, false, false, false, false, 0, null);
+        return event;
+      }
+      overlay.dispatchEvent(mouseAt('mousedown', 10, 20));
+      overlay.dispatchEvent(mouseAt('mousemove', 110, 70));
+      overlay.dispatchEvent(mouseAt('mouseup', 110, 70));
+      expect(win.document.querySelectorAll('[data-vitrine-region]')).to.have.length(1);
+      var removeButton = win.document.querySelector('.vitrine-region-remove');
+      var clickRemove = win.document.createEvent('MouseEvents');
+      clickRemove.initEvent('click', true, true);
+      removeButton.dispatchEvent(clickRemove);
+      expect(win.document.querySelectorAll('[data-vitrine-region]')).to.have.length(0);
+      expect(win.document.querySelectorAll('.vitrine-region-row')).to.have.length(0);
+      done();
+    });
+  });
 });

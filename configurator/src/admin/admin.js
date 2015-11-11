@@ -41,6 +41,16 @@ function buildUrlChangeHandler(getState, setState, documentRef, overlay,
   };
 }
 
+function buildRemoveHandler(getState, setState, documentRef, overlay,
+    regionCallbacks) {
+  return function (regionId) {
+    var current = getState();
+    var updated = state.removeRegion(current, current.selectedIndex, regionId);
+    setState(updated);
+    renderRegionsAndList(documentRef, overlay, updated, regionCallbacks);
+  };
+}
+
 function buildOnDragEnd(getState, setState, documentRef, overlay,
     regionCallbacks) {
   return function (rect) {
@@ -64,6 +74,8 @@ function refreshEditor(documentRef, getState, setState, payload) {
   }
   var regionCallbacks = {};
   regionCallbacks.onUrlChange = buildUrlChangeHandler(getState, setState,
+    documentRef, parts.overlay, regionCallbacks);
+  regionCallbacks.onRemove = buildRemoveHandler(getState, setState,
     documentRef, parts.overlay, regionCallbacks);
   renderRegionsAndList(documentRef, parts.overlay, current, regionCallbacks);
   dragHandlers.attachDragHandlers(parts.overlay, {

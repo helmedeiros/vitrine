@@ -43,10 +43,18 @@
       border-radius: 3px;
       font-size: 0.92em;
     }
+    h2.section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin: 2rem 0 1rem;
+    }
     #vitrine-image-list {
       list-style: none;
       padding: 0;
-      margin: 1.5rem 0 0;
+      margin: 0;
       display: flex;
       flex-wrap: wrap;
     }
@@ -58,6 +66,13 @@
       border-radius: 3px;
       padding: 0.5rem;
       text-align: center;
+      cursor: pointer;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+    .vitrine-image-card:hover { border-color: #b0b0b0; }
+    .vitrine-card-selected {
+      border-color: #e95950;
+      box-shadow: 0 0 0 2px rgba(233, 89, 80, 0.25);
     }
     .vitrine-image-thumb {
       width: 100%;
@@ -75,6 +90,52 @@
       word-break: break-all;
       line-height: 1.35;
     }
+    #vitrine-editor {
+      margin-top: 1rem;
+      background: #ffffff;
+      border: 1px solid #e2e2e2;
+      border-radius: 3px;
+      padding: 1rem;
+      min-height: 80px;
+    }
+    .vitrine-editor-image-wrapper { display: inline-block; }
+    .vitrine-editor-image { max-width: 100%; }
+    #vitrine-region-list {
+      margin-top: 1rem;
+    }
+    .vitrine-region-row {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 1px solid #e2e2e2;
+      border-radius: 3px;
+      padding: 0.5rem 0.75rem;
+      margin-bottom: 0.4rem;
+    }
+    .vitrine-region-label {
+      font-family: Menlo, Consolas, monospace;
+      font-size: 0.78rem;
+      color: #555;
+      flex: 0 0 110px;
+    }
+    .vitrine-region-url-input {
+      flex: 1;
+      border: 1px solid #d4d4d4;
+      border-radius: 3px;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.92rem;
+      margin: 0 0.5rem;
+    }
+    .vitrine-region-remove {
+      background: #ffffff;
+      color: #c84a44;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .vitrine-region-remove:hover { background: #fde8e7; border-color: #c84a44; }
   </style>
 </head>
 <body>
@@ -84,13 +145,21 @@
 
   <main class="layout">
     <div class="empty-state">
-      Load this page with <code>#data=&lt;base64&gt;</code> in the URL to import images.
+      Load this page with <code>#data=&lt;base64&gt;</code> in the URL to import
+      images. Open any demo from the
+      <a href="../">vitrine home page</a> and click <strong>Open in Vitrine</strong>.
     </div>
 
+    <h2 class="section-title">Detected images</h2>
     <ul id="vitrine-image-list"></ul>
+
+    <h2 class="section-title">Editor</h2>
+    <div id="vitrine-editor"></div>
+
+    <h2 class="section-title">Regions</h2>
+    <div id="vitrine-region-list"></div>
   </main>
 
-  <script src="admin-shell.js"></script>
-  <script src="admin-bootstrap.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>

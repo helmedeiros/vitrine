@@ -7,6 +7,8 @@ var dragHandlers = require('./drag-handlers');
 var state = require('./editor-state');
 var overlays = require('./region-overlays');
 var regionList = require('./region-list');
+var exportConfig = require('./export-config');
+var exportPanel = require('./export-panel');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -104,6 +106,10 @@ function start(windowRef, documentRef) {
     setState(state.selectImage(getState(), index));
     selection.markSelectedCard(documentRef, index);
     refreshEditor(documentRef, getState, setState, payload);
+  });
+  exportPanel.attachExportButton(documentRef, function () {
+    return exportConfig.buildExportSnippet(
+      exportConfig.buildExportConfig(getState(), payload));
   });
 }
 

@@ -140,6 +140,42 @@ describe('admin bundle in jsdom', function () {
     });
   });
 
+  it('writes the VITRINE_CONFIG snippet to the export output when clicked',
+    function (done) {
+      var html = '<!doctype html><html><body>' +
+        '<ul id="vitrine-image-list"></ul>' +
+        '<div id="vitrine-editor"></div>' +
+        '<div id="vitrine-region-list"></div>' +
+        '<button id="vitrine-export-button">Generate</button>' +
+        '<textarea id="vitrine-export-output"></textarea>' +
+        '</body></html>';
+      withAdminPage([{src: 'http://x/a.jpg'}], html, function (err, win) {
+        if (err) { done(err); return; }
+        var card = win.document.querySelector('.vitrine-image-card');
+        var click = win.document.createEvent('MouseEvents');
+        click.initEvent('click', true, true);
+        card.dispatchEvent(click);
+        var overlay = win.document.querySelector('.vitrine-editor-overlay');
+        function mouseAt(type, x, y) {
+          var event = win.document.createEvent('MouseEvents');
+          event.initMouseEvent(type, true, true, win, 0,
+            0, 0, x, y, false, false, false, false, 0, null);
+          return event;
+        }
+        overlay.dispatchEvent(mouseAt('mousedown', 10, 20));
+        overlay.dispatchEvent(mouseAt('mousemove', 110, 70));
+        overlay.dispatchEvent(mouseAt('mouseup', 110, 70));
+        var exportClick = win.document.createEvent('MouseEvents');
+        exportClick.initEvent('click', true, true);
+        win.document.getElementById('vitrine-export-button')
+          .dispatchEvent(exportClick);
+        var output = win.document.getElementById('vitrine-export-output').value;
+        expect(output).to.contain('window.VITRINE_CONFIG');
+        expect(output).to.contain('http://x/a.jpg');
+        done();
+      });
+    });
+
   it('removes the region overlay and row when Remove is clicked', function (done) {
     var html = '<!doctype html><html><body>' +
       '<ul id="vitrine-image-list"></ul>' +

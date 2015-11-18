@@ -17,8 +17,8 @@ function resolveAdminUrl(windowRef, options) {
 
 function autoStart(windowRef, documentRef, options) {
   var mode = runtime.detectMode(windowRef.VITRINE_CONFIG);
-  if (mode !== 'discovery') {
-    return null;
+  if (mode === 'config') {
+    return runtime.mountConfig(documentRef, windowRef.VITRINE_CONFIG);
   }
   var detected = runtime.scanImages(documentRef);
   var adminUrl = resolveAdminUrl(windowRef, options);

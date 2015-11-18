@@ -90,11 +90,15 @@ describe('autoStart', function () {
     expect(body.appended).to.have.length(1);
   });
 
-  it('returns null when a config object is already present', function () {
-    var documentRef = fakeDocument([fakeImg('a')]);
-    var win = fakeWindow({VITRINE_CONFIG: {images: []}});
-    expect(autoStart(win, documentRef)).to.equal(null);
-  });
+  it('mounts config hotspots instead of the discovery panel when config is set',
+    function () {
+      var body = fakeBody();
+      var documentRef = fakeDocument([fakeImg('a')], body);
+      var win = fakeWindow({VITRINE_CONFIG: {images: []}});
+      var result = autoStart(win, documentRef);
+      expect(Array.isArray(result)).to.equal(true);
+      expect(body.appended).to.have.length(0);
+    });
 
   it('uses the default admin URL when none is supplied', function () {
     var body = fakeBody();

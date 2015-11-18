@@ -74,7 +74,7 @@ if (typeof window !== 'undefined') {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":12}],2:[function(require,module,exports){
+},{"buffer":14}],2:[function(require,module,exports){
 'use strict';
 
 var shell = require('./admin-shell');
@@ -84,6 +84,8 @@ var dragHandlers = require('./drag-handlers');
 var state = require('./editor-state');
 var overlays = require('./region-overlays');
 var regionList = require('./region-list');
+var exportConfig = require('./export-config');
+var exportPanel = require('./export-panel');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -182,6 +184,10 @@ function start(windowRef, documentRef) {
     selection.markSelectedCard(documentRef, index);
     refreshEditor(documentRef, getState, setState, payload);
   });
+  exportPanel.attachExportButton(documentRef, function () {
+    return exportConfig.buildExportSnippet(
+      exportConfig.buildExportConfig(getState(), payload));
+  });
 }
 
 function bind(windowRef, documentRef) {
@@ -204,7 +210,7 @@ module.exports = {
   bind: bind
 };
 
-},{"./admin-shell":1,"./drag-handlers":3,"./editor-state":6,"./editor-view":7,"./image-selection":8,"./region-list":9,"./region-overlays":10}],3:[function(require,module,exports){
+},{"./admin-shell":1,"./drag-handlers":3,"./editor-state":6,"./editor-view":7,"./export-config":8,"./export-panel":9,"./image-selection":10,"./region-list":11,"./region-overlays":12}],3:[function(require,module,exports){
 'use strict';
 
 var dragSession = require('./drag-session');
@@ -583,6 +589,86 @@ if (typeof window !== 'undefined') {
 },{}],8:[function(require,module,exports){
 'use strict';
 
+function regionForExport(region) {
+  return {
+    x: region.x,
+    y: region.y,
+    width: region.width,
+    height: region.height,
+    url: region.url || ''
+  };
+}
+
+function exportableImage(image, regions) {
+  var exported = {src: image.src, regions: []};
+  for (var i = 0; i < regions.length; i++) {
+    exported.regions.push(regionForExport(regions[i]));
+  }
+  return exported;
+}
+
+function buildExportConfig(state, payload) {
+  if (!state || !state.regionsByIndex ||
+      !payload || !Array.isArray(payload.images)) {
+    return {images: []};
+  }
+  var images = [];
+  var byIndex = state.regionsByIndex;
+  for (var indexStr in byIndex) {
+    if (!byIndex.hasOwnProperty(indexStr)) {
+      continue;
+    }
+    var index = Number(indexStr);
+    var regions = byIndex[indexStr];
+    if (!regions || regions.length === 0) {
+      continue;
+    }
+    var image = payload.images[index];
+    if (!image) {
+      continue;
+    }
+    images.push(exportableImage(image, regions));
+  }
+  return {images: images};
+}
+
+function buildExportSnippet(config) {
+  return '<script>window.VITRINE_CONFIG = ' + JSON.stringify(config) + ';</script>';
+}
+
+module.exports = {
+  buildExportConfig: buildExportConfig,
+  buildExportSnippet: buildExportSnippet
+};
+
+},{}],9:[function(require,module,exports){
+'use strict';
+
+var BUTTON_ID = 'vitrine-export-button';
+var OUTPUT_ID = 'vitrine-export-output';
+
+function attachExportButton(documentRef, getSnippet) {
+  var button = documentRef.getElementById(BUTTON_ID);
+  if (!button) {
+    return;
+  }
+  button.addEventListener('click', function () {
+    var output = documentRef.getElementById(OUTPUT_ID);
+    if (output) {
+      output.value = getSnippet();
+    }
+  });
+}
+
+module.exports = {
+  attachExportButton: attachExportButton,
+  BUTTON_ID: BUTTON_ID,
+  OUTPUT_ID: OUTPUT_ID
+};
+
+},{}],10:[function(require,module,exports){
+'use strict';
+
 var SELECTED_CLASS = 'vitrine-card-selected';
 
 function bindClickToIndex(card, index, onSelect) {
@@ -628,7 +714,7 @@ if (typeof window !== 'undefined') {
   window.vitrineImageSelection = imageSelection;
 }
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var REGION_LIST_ID = 'vitrine-region-list';
@@ -703,7 +789,7 @@ module.exports = {
   REGION_LIST_ID: REGION_LIST_ID
 };
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 var OVERLAY_BASE_STYLES = [
@@ -754,7 +840,7 @@ module.exports = {
   renderRegions: renderRegions
 };
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -880,7 +966,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2432,14 +2518,14 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":11,"ieee754":14,"isarray":13}],13:[function(require,module,exports){
+},{"base64-js":13,"ieee754":16,"isarray":15}],15:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m

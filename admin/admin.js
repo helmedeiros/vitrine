@@ -130,8 +130,20 @@ function buildRemoveHandler(getState, setState, documentRef, overlay,
   };
 }
 
+function captureImageDimensions(updatedState, imageElement) {
+  if (!imageElement || typeof imageElement.getBoundingClientRect !== 'function') {
+    return updatedState;
+  }
+  var imgRect = imageElement.getBoundingClientRect();
+  if (!imgRect || !imgRect.width || !imgRect.height) {
+    return updatedState;
+  }
+  return state.setImageDimensions(updatedState, updatedState.selectedIndex,
+    imgRect.width, imgRect.height);
+}
+
 function buildOnDragEnd(getState, setState, documentRef, overlay,
-    regionCallbacks) {
+    regionCallbacks, getImageElement) {
   return function (rect) {
     var current = getState();
     if (current.selectedIndex === null) {
@@ -139,6 +151,7 @@ function buildOnDragEnd(getState, setState, documentRef, overlay,
     }
     var region = regionFromRect(current, rect);
     var updated = state.addRegion(current, current.selectedIndex, region);
+    updated = captureImageDimensions(updated, getImageElement());
     setState(updated);
     renderRegionsAndList(documentRef, overlay, updated, regionCallbacks);
   };
@@ -160,7 +173,7 @@ function refreshEditor(documentRef, getState, setState, payload) {
   dragHandlers.attachDragHandlers(parts.overlay, {
     minSize: 4,
     onEnd: buildOnDragEnd(getState, setState, documentRef, parts.overlay,
-      regionCallbacks)
+      regionCallbacks, function () { return parts.image; })
   });
 }
 
@@ -385,7 +398,26 @@ function shallowClone(obj) {
 }
 
 function createEditorState() {
-  return {selectedIndex: null, regionsByIndex: {}};
+  return {selectedIndex: null, regionsByIndex: {}, imageDimensions: {}};
+}
+
+function setImageDimensions(state, imageIndex, width, height) {
+  if (!isNonNegativeInteger(imageIndex)) {
+    throw new Error('setImageDimensions requires a non-negative integer imageIndex');
+  }
+  var current = state || createEditorState();
+  var imageDimensions = shallowClone(current.imageDimensions || {});
+  imageDimensions[imageIndex] = {width: width, height: height};
+  var next = shallowClone(current);
+  next.imageDimensions = imageDimensions;
+  return next;
+}
+
+function getImageDimensions(state, imageIndex) {
+  if (!state || !state.imageDimensions) {
+    return null;
+  }
+  return state.imageDimensions[imageIndex] || null;
 }
 
 function selectImage(state, index) {
@@ -508,7 +540,9 @@ module.exports = {
   addRegion: addRegion,
   removeRegion: removeRegion,
   updateRegionUrl: updateRegionUrl,
-  listRegions: listRegions
+  listRegions: listRegions,
+  setImageDimensions: setImageDimensions,
+  getImageDimensions: getImageDimensions
 };
 
 },{}],7:[function(require,module,exports){
@@ -599,8 +633,13 @@ function regionForExport(region) {
   };
 }
 
-function exportableImage(image, regions) {
-  var exported = {src: image.src, regions: []};
+function exportableImage(image, regions, dimensions) {
+  var exported = {src: image.src};
+  if (dimensions && dimensions.width && dimensions.height) {
+    exported.recordedWidth = dimensions.width;
+    exported.recordedHeight = dimensions.height;
+  }
+  exported.regions = [];
   for (var i = 0; i < regions.length; i++) {
     exported.regions.push(regionForExport(regions[i]));
   }
@@ -614,6 +653,7 @@ function buildExportConfig(state, payload) {
   }
   var images = [];
   var byIndex = state.regionsByIndex;
+  var byDims = state.imageDimensions || {};
   for (var indexStr in byIndex) {
     if (!byIndex.hasOwnProperty(indexStr)) {
       continue;
@@ -627,7 +667,7 @@ function buildExportConfig(state, payload) {
     if (!image) {
       continue;
     }
-    images.push(exportableImage(image, regions));
+    images.push(exportableImage(image, regions, byDims[indexStr]));
   }
   return {images: images};
 }

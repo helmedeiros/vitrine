@@ -1940,14 +1940,43 @@ function buildHotspot(documentRef, region) {
   return hotspot;
 }
 
-function mountHotspots(documentRef, imgElement, regions) {
+function computeScale(imgElement, imageConfig) {
+  var identity = {x: 1, y: 1};
+  if (!imageConfig.recordedWidth || !imageConfig.recordedHeight) {
+    return identity;
+  }
+  if (typeof imgElement.getBoundingClientRect !== 'function') {
+    return identity;
+  }
+  var rect = imgElement.getBoundingClientRect();
+  if (!rect || !rect.width || !rect.height) {
+    return identity;
+  }
+  return {
+    x: rect.width / imageConfig.recordedWidth,
+    y: rect.height / imageConfig.recordedHeight
+  };
+}
+
+function scaleRegion(region, scale) {
+  return {
+    x: region.x * scale.x,
+    y: region.y * scale.y,
+    width: region.width * scale.x,
+    height: region.height * scale.y,
+    url: region.url
+  };
+}
+
+function mountHotspots(documentRef, imgElement, regions, imageConfig) {
   var wrapper = wrapImageElement(documentRef, imgElement);
   if (!wrapper) {
     return [];
   }
+  var scale = computeScale(imgElement, imageConfig || {});
   var mounted = [];
   for (var i = 0; i < regions.length; i++) {
-    var hotspot = buildHotspot(documentRef, regions[i]);
+    var hotspot = buildHotspot(documentRef, scaleRegion(regions[i], scale));
     wrapper.appendChild(hotspot);
     mounted.push(hotspot);
   }
@@ -1964,7 +1993,7 @@ function mountConfig(documentRef, config) {
     var matched = findImages(documentRef, imageConfig.src);
     for (var j = 0; j < matched.length; j++) {
       var hotspots = mountHotspots(documentRef, matched[j],
-        imageConfig.regions || []);
+        imageConfig.regions || [], imageConfig);
       allMounted = allMounted.concat(hotspots);
     }
   }

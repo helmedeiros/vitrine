@@ -28,7 +28,26 @@ function shallowClone(obj) {
 }
 
 function createEditorState() {
-  return {selectedIndex: null, regionsByIndex: {}};
+  return {selectedIndex: null, regionsByIndex: {}, imageDimensions: {}};
+}
+
+function setImageDimensions(state, imageIndex, width, height) {
+  if (!isNonNegativeInteger(imageIndex)) {
+    throw new Error('setImageDimensions requires a non-negative integer imageIndex');
+  }
+  var current = state || createEditorState();
+  var imageDimensions = shallowClone(current.imageDimensions || {});
+  imageDimensions[imageIndex] = {width: width, height: height};
+  var next = shallowClone(current);
+  next.imageDimensions = imageDimensions;
+  return next;
+}
+
+function getImageDimensions(state, imageIndex) {
+  if (!state || !state.imageDimensions) {
+    return null;
+  }
+  return state.imageDimensions[imageIndex] || null;
 }
 
 function selectImage(state, index) {
@@ -151,5 +170,7 @@ module.exports = {
   addRegion: addRegion,
   removeRegion: removeRegion,
   updateRegionUrl: updateRegionUrl,
-  listRegions: listRegions
+  listRegions: listRegions,
+  setImageDimensions: setImageDimensions,
+  getImageDimensions: getImageDimensions
 };

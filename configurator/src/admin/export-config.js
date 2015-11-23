@@ -10,8 +10,13 @@ function regionForExport(region) {
   };
 }
 
-function exportableImage(image, regions) {
-  var exported = {src: image.src, regions: []};
+function exportableImage(image, regions, dimensions) {
+  var exported = {src: image.src};
+  if (dimensions && dimensions.width && dimensions.height) {
+    exported.recordedWidth = dimensions.width;
+    exported.recordedHeight = dimensions.height;
+  }
+  exported.regions = [];
   for (var i = 0; i < regions.length; i++) {
     exported.regions.push(regionForExport(regions[i]));
   }
@@ -25,6 +30,7 @@ function buildExportConfig(state, payload) {
   }
   var images = [];
   var byIndex = state.regionsByIndex;
+  var byDims = state.imageDimensions || {};
   for (var indexStr in byIndex) {
     if (!byIndex.hasOwnProperty(indexStr)) {
       continue;
@@ -38,7 +44,7 @@ function buildExportConfig(state, payload) {
     if (!image) {
       continue;
     }
-    images.push(exportableImage(image, regions));
+    images.push(exportableImage(image, regions, byDims[indexStr]));
   }
   return {images: images};
 }

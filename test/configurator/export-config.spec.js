@@ -70,6 +70,25 @@ describe('buildExportConfig', function () {
     var config = exportConfig.buildExportConfig(s, samplePayload);
     expect(config.images).to.have.length(0);
   });
+
+  it('includes recordedWidth and recordedHeight when dimensions are set',
+    function () {
+      var s = editorState.createEditorState();
+      s = withRegion(s, 0, {id: 'r1', x: 10, y: 20, width: 100, height: 50});
+      s = editorState.setImageDimensions(s, 0, 520, 650);
+      var config = exportConfig.buildExportConfig(s, samplePayload);
+      expect(config.images[0].recordedWidth).to.equal(520);
+      expect(config.images[0].recordedHeight).to.equal(650);
+    });
+
+  it('omits recordedWidth and recordedHeight when none are recorded',
+    function () {
+      var s = editorState.createEditorState();
+      s = withRegion(s, 0, {id: 'r1', x: 10, y: 20, width: 100, height: 50});
+      var config = exportConfig.buildExportConfig(s, samplePayload);
+      expect(config.images[0].recordedWidth).to.equal(undefined);
+      expect(config.images[0].recordedHeight).to.equal(undefined);
+    });
 });
 
 describe('buildExportSnippet', function () {

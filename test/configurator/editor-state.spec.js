@@ -170,6 +170,55 @@ describe('removeRegion', function () {
   });
 });
 
+describe('setImageDimensions', function () {
+  it('records the rendered dimensions for an image index', function () {
+    var s = editorState.setImageDimensions(editorState.createEditorState(),
+      0, 520, 650);
+    expect(s.imageDimensions[0]).to.deep.equal({width: 520, height: 650});
+  });
+
+  it('preserves dimensions for other images', function () {
+    var s = editorState.createEditorState();
+    s = editorState.setImageDimensions(s, 0, 100, 200);
+    s = editorState.setImageDimensions(s, 1, 300, 400);
+    expect(s.imageDimensions[0]).to.deep.equal({width: 100, height: 200});
+    expect(s.imageDimensions[1]).to.deep.equal({width: 300, height: 400});
+  });
+
+  it('does not mutate the prior state', function () {
+    var initial = editorState.createEditorState();
+    editorState.setImageDimensions(initial, 0, 100, 200);
+    expect(initial.imageDimensions || {}).to.deep.equal({});
+  });
+
+  it('rejects an invalid image index', function () {
+    var s = editorState.createEditorState();
+    expect(function () { return editorState.setImageDimensions(s, -1, 1, 1); })
+      .to.throw();
+    expect(function () { return editorState.setImageDimensions(s, 1.5, 1, 1); })
+      .to.throw();
+  });
+});
+
+describe('getImageDimensions', function () {
+  it('returns the recorded dimensions for an image', function () {
+    var s = editorState.setImageDimensions(editorState.createEditorState(),
+      0, 520, 650);
+    expect(editorState.getImageDimensions(s, 0)).to.deep.equal({
+      width: 520, height: 650
+    });
+  });
+
+  it('returns null when no dimensions have been recorded', function () {
+    expect(editorState.getImageDimensions(editorState.createEditorState(), 0))
+      .to.equal(null);
+  });
+
+  it('returns null for a null state', function () {
+    expect(editorState.getImageDimensions(null, 0)).to.equal(null);
+  });
+});
+
 describe('updateRegionUrl', function () {
   it('attaches the url to the named region', function () {
     var s = editorState.createEditorState();

@@ -53,8 +53,20 @@ function buildRemoveHandler(getState, setState, documentRef, overlay,
   };
 }
 
+function captureImageDimensions(updatedState, imageElement) {
+  if (!imageElement || typeof imageElement.getBoundingClientRect !== 'function') {
+    return updatedState;
+  }
+  var imgRect = imageElement.getBoundingClientRect();
+  if (!imgRect || !imgRect.width || !imgRect.height) {
+    return updatedState;
+  }
+  return state.setImageDimensions(updatedState, updatedState.selectedIndex,
+    imgRect.width, imgRect.height);
+}
+
 function buildOnDragEnd(getState, setState, documentRef, overlay,
-    regionCallbacks) {
+    regionCallbacks, getImageElement) {
   return function (rect) {
     var current = getState();
     if (current.selectedIndex === null) {
@@ -62,6 +74,7 @@ function buildOnDragEnd(getState, setState, documentRef, overlay,
     }
     var region = regionFromRect(current, rect);
     var updated = state.addRegion(current, current.selectedIndex, region);
+    updated = captureImageDimensions(updated, getImageElement());
     setState(updated);
     renderRegionsAndList(documentRef, overlay, updated, regionCallbacks);
   };
@@ -83,7 +96,7 @@ function refreshEditor(documentRef, getState, setState, payload) {
   dragHandlers.attachDragHandlers(parts.overlay, {
     minSize: 4,
     onEnd: buildOnDragEnd(getState, setState, documentRef, parts.overlay,
-      regionCallbacks)
+      regionCallbacks, function () { return parts.image; })
   });
 }
 

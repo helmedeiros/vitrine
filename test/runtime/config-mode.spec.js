@@ -53,9 +53,12 @@ function fakeDocument(images, body) {
   };
 }
 
-function fakeImage(src) {
+function fakeImage(src, rect) {
   var img = fakeElement('img');
   img.src = src;
+  if (rect) {
+    img.getBoundingClientRect = function () { return rect; };
+  }
   return img;
 }
 
@@ -144,4 +147,63 @@ describe('mountConfig', function () {
       }]});
       expect(mounted).to.have.length(2);
     });
+});
+
+describe('mountConfig coordinate scaling', function () {
+  it('scales region coordinates when recorded dimensions are present', function () {
+    var imgA = fakeImage('http://host/a.jpg',
+      {left: 0, top: 0, width: 260, height: 325, right: 260, bottom: 325});
+    var doc = fakeDocument([imgA]);
+    var mounted = configMode.mountConfig(doc, {images: [{
+      src: 'http://host/a.jpg',
+      recordedWidth: 520,
+      recordedHeight: 650,
+      regions: [{x: 100, y: 200, width: 50, height: 50, url: 'http://x/'}]
+    }]});
+    var hotspot = mounted[0];
+    expect(hotspot.style.cssText).to.contain('left:50px');
+    expect(hotspot.style.cssText).to.contain('top:100px');
+    expect(hotspot.style.cssText).to.contain('width:25px');
+    expect(hotspot.style.cssText).to.contain('height:25px');
+  });
+
+  it('does not scale when recorded dimensions are missing', function () {
+    var imgA = fakeImage('http://host/a.jpg',
+      {left: 0, top: 0, width: 260, height: 325, right: 260, bottom: 325});
+    var doc = fakeDocument([imgA]);
+    var mounted = configMode.mountConfig(doc, {images: [{
+      src: 'http://host/a.jpg',
+      regions: [{x: 100, y: 200, width: 50, height: 50, url: 'http://x/'}]
+    }]});
+    expect(mounted[0].style.cssText).to.contain('left:100px');
+    expect(mounted[0].style.cssText).to.contain('top:200px');
+  });
+
+  it('does not scale when host image has zero rendered size', function () {
+    var imgA = fakeImage('http://host/a.jpg',
+      {left: 0, top: 0, width: 0, height: 0, right: 0, bottom: 0});
+    var doc = fakeDocument([imgA]);
+    var mounted = configMode.mountConfig(doc, {images: [{
+      src: 'http://host/a.jpg',
+      recordedWidth: 520,
+      recordedHeight: 650,
+      regions: [{x: 10, y: 10, width: 5, height: 5, url: 'http://x/'}]
+    }]});
+    expect(mounted[0].style.cssText).to.contain('left:10px');
+    expect(mounted[0].style.cssText).to.contain('top:10px');
+  });
+
+  it('scales x and y independently when host aspect ratio differs', function () {
+    var imgA = fakeImage('http://host/a.jpg',
+      {left: 0, top: 0, width: 260, height: 162, right: 260, bottom: 162});
+    var doc = fakeDocument([imgA]);
+    var mounted = configMode.mountConfig(doc, {images: [{
+      src: 'http://host/a.jpg',
+      recordedWidth: 520,
+      recordedHeight: 650,
+      regions: [{x: 100, y: 100, width: 100, height: 100, url: 'http://x/'}]
+    }]});
+    expect(mounted[0].style.cssText).to.contain('left:50px');
+    expect(mounted[0].style.cssText).to.contain('top:' + (100 * 162 / 650) + 'px');
+  });
 });

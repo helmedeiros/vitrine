@@ -124,6 +124,7 @@ function start(windowRef, documentRef) {
     return exportConfig.buildExportSnippet(
       exportConfig.buildExportConfig(getState(), payload));
   });
+  exportPanel.attachCopyButton(documentRef);
 }
 
 function bind(windowRef, documentRef) {

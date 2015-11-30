@@ -72,3 +72,61 @@ describe('attachExportButton', function () {
     expect(function () { button.fire('click'); }).to.not.throw();
   });
 });
+
+describe('attachCopyButton', function () {
+  function fakeCopyDocument(copyButton, output, executedCommands) {
+    return {
+      getElementById: function (id) {
+        if (id === 'vitrine-copy-button') { return copyButton; }
+        if (id === 'vitrine-export-output') { return output; }
+        return null;
+      },
+      execCommand: function (name) {
+        executedCommands.push(name);
+        return true;
+      }
+    };
+  }
+
+  it('selects the textarea and runs the copy command on click', function () {
+    var copyButton = fakeElement('button');
+    var output = fakeElement('textarea');
+    var selects = 0;
+    output.select = function () { selects++; };
+    var executed = [];
+    exportPanel.attachCopyButton(fakeCopyDocument(copyButton, output, executed));
+    copyButton.fire('click');
+    expect(selects).to.equal(1);
+    expect(executed).to.deep.equal(['copy']);
+  });
+
+  it('does nothing when the copy button is missing', function () {
+    var output = fakeElement('textarea');
+    var executed = [];
+    expect(function () {
+      exportPanel.attachCopyButton(fakeCopyDocument(null, output, executed));
+    }).to.not.throw();
+  });
+
+  it('does nothing when the output is missing', function () {
+    var copyButton = fakeElement('button');
+    var executed = [];
+    exportPanel.attachCopyButton(fakeCopyDocument(copyButton, null, executed));
+    expect(function () { copyButton.fire('click'); }).to.not.throw();
+  });
+
+  it('survives a document without execCommand', function () {
+    var copyButton = fakeElement('button');
+    var output = fakeElement('textarea');
+    output.select = function () { return; };
+    var documentRef = {
+      getElementById: function (id) {
+        if (id === 'vitrine-copy-button') { return copyButton; }
+        if (id === 'vitrine-export-output') { return output; }
+        return null;
+      }
+    };
+    exportPanel.attachCopyButton(documentRef);
+    expect(function () { copyButton.fire('click'); }).to.not.throw();
+  });
+});

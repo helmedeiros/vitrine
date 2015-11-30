@@ -1,5 +1,7 @@
 'use strict';
 
+var hotspotStyles = require('./hotspot-styles');
+
 var WRAPPER_STYLES = 'position:relative;display:inline-block';
 
 var HOTSPOT_BASE_STYLES = [
@@ -103,6 +105,7 @@ function mountConfig(documentRef, config) {
   if (!config || !Array.isArray(config.images)) {
     return [];
   }
+  hotspotStyles.ensureStylesInstalled(documentRef);
   var allMounted = [];
   for (var i = 0; i < config.images.length; i++) {
     var imageConfig = config.images[i];

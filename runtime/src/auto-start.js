@@ -1,6 +1,7 @@
 'use strict';
 
 var runtime = require('./runtime');
+var reflow = require('./reflow');
 
 var DEFAULT_ADMIN_URL = 'https://helmedeiros.github.io/vitrine/admin/';
 
@@ -18,7 +19,9 @@ function resolveAdminUrl(windowRef, options) {
 function autoStart(windowRef, documentRef, options) {
   var mode = runtime.detectMode(windowRef.VITRINE_CONFIG);
   if (mode === 'config') {
-    return runtime.mountConfig(documentRef, windowRef.VITRINE_CONFIG);
+    var mounted = runtime.mountConfig(documentRef, windowRef.VITRINE_CONFIG);
+    reflow.attachReflow(windowRef, documentRef);
+    return mounted;
   }
   var detected = runtime.scanImages(documentRef);
   var adminUrl = resolveAdminUrl(windowRef, options);

@@ -46,7 +46,22 @@ function wrapImageElement(documentRef, imgElement) {
   return wrapper;
 }
 
-function buildHotspot(documentRef, region) {
+function setOriginalGeometry(hotspot, originalRegion, imageConfig) {
+  hotspot.setAttribute('data-vitrine-x', String(originalRegion.x));
+  hotspot.setAttribute('data-vitrine-y', String(originalRegion.y));
+  hotspot.setAttribute('data-vitrine-width', String(originalRegion.width));
+  hotspot.setAttribute('data-vitrine-height', String(originalRegion.height));
+  if (imageConfig.recordedWidth) {
+    hotspot.setAttribute('data-vitrine-recorded-width',
+      String(imageConfig.recordedWidth));
+  }
+  if (imageConfig.recordedHeight) {
+    hotspot.setAttribute('data-vitrine-recorded-height',
+      String(imageConfig.recordedHeight));
+  }
+}
+
+function buildHotspot(documentRef, region, originalRegion, imageConfig) {
   var hotspot = documentRef.createElement('a');
   hotspot.href = region.url || '#';
   hotspot.setAttribute('data-vitrine-hotspot', '');
@@ -55,6 +70,9 @@ function buildHotspot(documentRef, region) {
     'top:' + region.y + 'px;' +
     'width:' + region.width + 'px;' +
     'height:' + region.height + 'px';
+  if (originalRegion && imageConfig) {
+    setOriginalGeometry(hotspot, originalRegion, imageConfig);
+  }
   return hotspot;
 }
 
@@ -94,7 +112,8 @@ function mountHotspots(documentRef, imgElement, regions, imageConfig) {
   var scale = computeScale(imgElement, imageConfig || {});
   var mounted = [];
   for (var i = 0; i < regions.length; i++) {
-    var hotspot = buildHotspot(documentRef, scaleRegion(regions[i], scale));
+    var hotspot = buildHotspot(documentRef,
+      scaleRegion(regions[i], scale), regions[i], imageConfig || {});
     wrapper.appendChild(hotspot);
     mounted.push(hotspot);
   }

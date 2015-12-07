@@ -10,6 +10,7 @@ var regionList = require('./region-list');
 var exportConfig = require('./export-config');
 var exportPanel = require('./export-panel');
 var dimCapture = require('./dim-capture');
+var draftStorage = require('./draft-storage');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -104,16 +105,33 @@ function refreshEditor(documentRef, getState, setState, payload) {
   });
 }
 
-function start(windowRef, documentRef) {
-  var currentState = state.createEditorState();
-  function getState() { return currentState; }
-  function setState(next) { currentState = next; }
+function resolveStorage(windowRef) {
+  if (!windowRef) {
+    return null;
+  }
+  try {
+    return windowRef.localStorage || null;
+  } catch (e) {
+    return null;
+  }
+}
 
+function start(windowRef, documentRef) {
+  var storage = resolveStorage(windowRef);
   var fragment = shell.readHashFragment(windowRef.location.hash || '');
   if (!fragment) {
     return;
   }
   var payload = shell.decodePayload(fragment);
+  var existingDraft = draftStorage.loadDraft(storage, payload.pageUrl);
+  var currentState = existingDraft || state.createEditorState();
+
+  function getState() { return currentState; }
+  function setState(next) {
+    currentState = next;
+    draftStorage.saveDraft(storage, payload.pageUrl, next);
+  }
+
   var count = shell.renderImageList(documentRef, payload);
   if (count === 0) {
     return;
@@ -124,6 +142,11 @@ function start(windowRef, documentRef) {
     selection.markSelectedCard(documentRef, index);
     refreshEditor(documentRef, getState, setState, payload);
   });
+  if (currentState.selectedIndex !== null &&
+      currentState.selectedIndex !== undefined) {
+    selection.markSelectedCard(documentRef, currentState.selectedIndex);
+    refreshEditor(documentRef, getState, setState, payload);
+  }
   exportPanel.attachExportButton(documentRef, function () {
     return exportConfig.buildExportSnippet(
       exportConfig.buildExportConfig(getState(), payload));

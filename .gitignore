@@ -1,0 +1,8 @@
+BACKLOG.md
+node_modules/
+package-lock.json
+coverage/
+.grunt/
+configurator/
+runtime/
+.DS_Store

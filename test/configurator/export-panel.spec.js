@@ -1,6 +1,7 @@
 'use strict';
 
 var expect = require('chai').expect;
+var sinon = require('sinon');
 var exportPanel = require('../../configurator/src/admin/export-panel');
 
 function fakeElement(tagName) {
@@ -128,5 +129,48 @@ describe('attachCopyButton', function () {
     };
     exportPanel.attachCopyButton(documentRef);
     expect(function () { copyButton.fire('click'); }).to.not.throw();
+  });
+
+  it('flashes the Copied! label after a successful copy', function () {
+    var clock = sinon.useFakeTimers();
+    try {
+      var copyButton = fakeElement('button');
+      copyButton.textContent = 'Copy';
+      var output = fakeElement('textarea');
+      output.select = function () { return; };
+      var executed = [];
+      exportPanel.attachCopyButton(fakeCopyDocument(copyButton, output, executed));
+      copyButton.fire('click');
+      expect(copyButton.textContent).to.equal('Copied!');
+      clock.tick(1500);
+      expect(copyButton.textContent).to.equal('Copy');
+    } finally {
+      clock.restore();
+    }
+  });
+
+  it('does not flash when execCommand reports failure', function () {
+    var clock = sinon.useFakeTimers();
+    try {
+      var copyButton = fakeElement('button');
+      copyButton.textContent = 'Copy';
+      var output = fakeElement('textarea');
+      output.select = function () { return; };
+      var failingDocument = {
+        getElementById: function (id) {
+          if (id === 'vitrine-copy-button') { return copyButton; }
+          if (id === 'vitrine-export-output') { return output; }
+          return null;
+        },
+        execCommand: function () { return false; }
+      };
+      exportPanel.attachCopyButton(failingDocument);
+      copyButton.fire('click');
+      expect(copyButton.textContent).to.equal('Copy');
+      clock.tick(2000);
+      expect(copyButton.textContent).to.equal('Copy');
+    } finally {
+      clock.restore();
+    }
   });
 });

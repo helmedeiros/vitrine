@@ -16,6 +16,14 @@ function attachExportButton(documentRef, getSnippet) {
   });
 }
 
+function flashCopiedLabel(button) {
+  var originalLabel = button.textContent;
+  button.textContent = 'Copied!';
+  if (typeof setTimeout === 'function') {
+    setTimeout(function () { button.textContent = originalLabel; }, 1200);
+  }
+}
+
 function attachCopyButton(documentRef) {
   var button = documentRef.getElementById('vitrine-copy-button');
   if (!button) {
@@ -29,8 +37,12 @@ function attachCopyButton(documentRef) {
     if (typeof output.select === 'function') {
       output.select();
     }
-    if (typeof documentRef.execCommand === 'function') {
-      documentRef.execCommand('copy');
+    if (typeof documentRef.execCommand !== 'function') {
+      return;
+    }
+    var success = documentRef.execCommand('copy');
+    if (success) {
+      flashCopiedLabel(button);
     }
   });
 }

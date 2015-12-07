@@ -9,6 +9,7 @@ var overlays = require('./region-overlays');
 var regionList = require('./region-list');
 var exportConfig = require('./export-config');
 var exportPanel = require('./export-panel');
+var dimCapture = require('./dim-capture');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -97,6 +98,9 @@ function refreshEditor(documentRef, getState, setState, payload) {
     minSize: 4,
     onEnd: buildOnDragEnd(getState, setState, documentRef, parts.overlay,
       regionCallbacks, function () { return parts.image; })
+  });
+  dimCapture.captureWhenReady(parts.image, function () {
+    setState(captureImageDimensions(getState(), parts.image));
   });
 }
 

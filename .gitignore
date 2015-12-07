@@ -6,6 +6,7 @@ coverage/
 runtime/dist/
 configurator/dist/
 package-lock.json
+BACKLOG.md
 *.swp
 *.swo
 .DS_Store

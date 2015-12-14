@@ -1,6 +1,10 @@
 'use strict';
 
+var urlValidation = require('./url-validation');
+
 var REGION_LIST_ID = 'vitrine-region-list';
+var ROW_CLASS = 'vitrine-region-row';
+var INVALID_CLASS = 'vitrine-region-row--invalid';
 
 function findContainer(documentRef) {
   return documentRef.getElementById(REGION_LIST_ID);
@@ -12,6 +16,13 @@ function emptyContainer(container) {
   }
 }
 
+function rowClassNameFor(url) {
+  if (urlValidation.isValidUrl(url)) {
+    return ROW_CLASS;
+  }
+  return ROW_CLASS + ' ' + INVALID_CLASS;
+}
+
 function buildLabel(documentRef, region) {
   var label = documentRef.createElement('span');
   label.className = 'vitrine-region-label';
@@ -19,18 +30,21 @@ function buildLabel(documentRef, region) {
   return label;
 }
 
-function buildUrlInput(documentRef, region, callbacks) {
+function buildUrlInput(documentRef, region, callbacks, onLocalChange) {
   var input = documentRef.createElement('input');
   input.type = 'url';
   input.value = region.url || '';
   input.placeholder = 'https://...';
   input.className = 'vitrine-region-url-input';
-  if (callbacks && callbacks.onUrlChange) {
-    input.addEventListener('input', function (event) {
-      var value = (event && event.target) ? event.target.value : input.value;
+  input.addEventListener('input', function (event) {
+    var value = (event && event.target) ? event.target.value : input.value;
+    if (onLocalChange) {
+      onLocalChange(value);
+    }
+    if (callbacks && callbacks.onUrlChange) {
       callbacks.onUrlChange(region.id, value);
-    });
-  }
+    }
+  });
   return input;
 }
 
@@ -48,10 +62,11 @@ function buildRemoveButton(documentRef, region, callbacks) {
 
 function buildRegionRow(documentRef, region, callbacks) {
   var row = documentRef.createElement('div');
-  row.className = 'vitrine-region-row';
+  row.className = rowClassNameFor(region.url);
   row.setAttribute('data-region-id', region.id);
   row.appendChild(buildLabel(documentRef, region));
-  row.appendChild(buildUrlInput(documentRef, region, callbacks));
+  row.appendChild(buildUrlInput(documentRef, region, callbacks,
+    function (currentValue) { row.className = rowClassNameFor(currentValue); }));
   row.appendChild(buildRemoveButton(documentRef, region, callbacks));
   return row;
 }
@@ -80,5 +95,6 @@ function renderRegionList(documentRef, regions, callbacks) {
 
 module.exports = {
   renderRegionList: renderRegionList,
-  REGION_LIST_ID: REGION_LIST_ID
+  REGION_LIST_ID: REGION_LIST_ID,
+  INVALID_CLASS: INVALID_CLASS
 };

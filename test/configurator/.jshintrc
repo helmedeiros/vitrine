@@ -1,5 +1,6 @@
 {
   "extends": "../.jshintrc",
+  "scripturl": true,
   "globals": {
     "escape": false,
     "unescape": false,

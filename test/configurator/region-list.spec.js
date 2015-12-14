@@ -146,4 +146,39 @@ describe('renderRegionList', function () {
     button.fire('click');
     expect(removed).to.deep.equal(['r1']);
   });
+
+  it('marks rows with empty or invalid URLs as invalid', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1}]);
+    expect(container.children[0].className).to.contain(regionList.INVALID_CLASS);
+  });
+
+  it('marks rows with javascript or other unsafe schemes as invalid', function () {
+    var container = fakeElement('div');
+    var unsafe = 'javascr' + 'ipt:alert(1)';
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1, url: unsafe}]);
+    expect(container.children[0].className).to.contain(regionList.INVALID_CLASS);
+  });
+
+  it('does not mark rows with valid http URLs as invalid', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1, url: 'http://shop/p/42'}]);
+    expect(container.children[0].className).to.not.contain(regionList.INVALID_CLASS);
+  });
+
+  it('updates row validity live as the URL input changes', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1}]);
+    var row = container.children[0];
+    expect(row.className).to.contain(regionList.INVALID_CLASS);
+    var input = row.children[1];
+    input.fire('input', {target: {value: 'https://shop/p/42'}});
+    expect(row.className).to.not.contain(regionList.INVALID_CLASS);
+    input.fire('input', {target: {value: ''}});
+    expect(row.className).to.contain(regionList.INVALID_CLASS);
+  });
 });

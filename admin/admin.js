@@ -1,4 +1,38 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.vitrineAdmin = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+
+var ERROR_ELEMENT_ID = 'vitrine-error';
+
+function findErrorElement(documentRef) {
+  return documentRef.getElementById(ERROR_ELEMENT_ID);
+}
+
+function showError(documentRef, message) {
+  var element = findErrorElement(documentRef);
+  if (!element) {
+    return;
+  }
+  element.textContent = message;
+  if (element.style) {
+    element.style.display = 'block';
+  }
+}
+
+function hideError(documentRef) {
+  var element = findErrorElement(documentRef);
+  if (!element || !element.style) {
+    return;
+  }
+  element.style.display = 'none';
+}
+
+module.exports = {
+  showError: showError,
+  hideError: hideError,
+  ERROR_ELEMENT_ID: ERROR_ELEMENT_ID
+};
+
+},{}],2:[function(require,module,exports){
 (function (Buffer){
 'use strict';
 
@@ -74,7 +108,7 @@ if (typeof window !== 'undefined') {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":16}],2:[function(require,module,exports){
+},{"buffer":19}],3:[function(require,module,exports){
 'use strict';
 
 var shell = require('./admin-shell');
@@ -88,6 +122,8 @@ var exportConfig = require('./export-config');
 var exportPanel = require('./export-panel');
 var dimCapture = require('./dim-capture');
 var draftStorage = require('./draft-storage');
+var clearRegions = require('./clear-regions');
+var adminErrors = require('./admin-errors');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -199,7 +235,21 @@ function start(windowRef, documentRef) {
   if (!fragment) {
     return;
   }
-  var payload = shell.decodePayload(fragment);
+  var payload;
+  try {
+    payload = shell.decodePayload(fragment);
+  } catch (decodeError) {
+    adminErrors.showError(documentRef,
+      'Could not decode the image payload from the URL: ' +
+      (decodeError && decodeError.message ? decodeError.message : 'unknown error'));
+    return;
+  }
+  if (!payload || !Array.isArray(payload.images)) {
+    adminErrors.showError(documentRef,
+      'The payload from the URL did not contain an images array.');
+    return;
+  }
+  adminErrors.hideError(documentRef);
   var existingDraft = draftStorage.loadDraft(storage, payload.pageUrl);
   var currentState = existingDraft || state.createEditorState();
 
@@ -229,6 +279,14 @@ function start(windowRef, documentRef) {
       exportConfig.buildExportConfig(getState(), payload));
   });
   exportPanel.attachCopyButton(documentRef);
+  clearRegions.attachClearButton(documentRef, function () {
+    var current = getState();
+    if (current.selectedIndex === null || current.selectedIndex === undefined) {
+      return;
+    }
+    setState(state.clearImageRegions(current, current.selectedIndex));
+    refreshEditor(documentRef, getState, setState, payload);
+  });
 }
 
 function bind(windowRef, documentRef) {
@@ -251,7 +309,22 @@ module.exports = {
   bind: bind
 };
 
-},{"./admin-shell":1,"./dim-capture":3,"./draft-storage":4,"./drag-handlers":5,"./editor-state":8,"./editor-view":9,"./export-config":10,"./export-panel":11,"./image-selection":12,"./region-list":13,"./region-overlays":14}],3:[function(require,module,exports){
+},{"./admin-errors":1,"./admin-shell":2,"./clear-regions":4,"./dim-capture":5,"./draft-storage":6,"./drag-handlers":7,"./editor-state":10,"./editor-view":11,"./export-config":12,"./export-panel":13,"./image-selection":14,"./region-list":15,"./region-overlays":16}],4:[function(require,module,exports){
+'use strict';
+
+function attachClearButton(documentRef, onClear) {
+  var button = documentRef.getElementById('vitrine-clear-regions');
+  if (!button) {
+    return;
+  }
+  button.addEventListener('click', onClear);
+}
+
+module.exports = {
+  attachClearButton: attachClearButton
+};
+
+},{}],5:[function(require,module,exports){
 'use strict';
 
 function isReady(imageElement) {
@@ -276,7 +349,7 @@ module.exports = {
   captureWhenReady: captureWhenReady
 };
 
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 'use strict';
 
 var KEY_PREFIX = 'vitrine-draft:';
@@ -329,7 +402,7 @@ module.exports = {
   clearDraft: clearDraft
 };
 
-},{}],5:[function(require,module,exports){
+},{}],7:[function(require,module,exports){
 'use strict';
 
 var dragSession = require('./drag-session');
@@ -396,7 +469,7 @@ if (typeof window !== 'undefined') {
   window.vitrineDragHandlers = dragHandlers;
 }
 
-},{"./drag-session":7}],6:[function(require,module,exports){
+},{"./drag-session":9}],8:[function(require,module,exports){
 'use strict';
 
 function isFiniteNumber(value) {
@@ -430,7 +503,7 @@ function rectangleFromDrag(startPoint, currentPoint, bounds) {
 
 module.exports = rectangleFromDrag;
 
-},{}],7:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 'use strict';
 
 var rectangleFromDrag = require('./drag-rectangle');
@@ -473,7 +546,7 @@ if (typeof window !== 'undefined') {
   window.vitrineDragSession = dragSession;
 }
 
-},{"./drag-rectangle":6}],8:[function(require,module,exports){
+},{"./drag-rectangle":8}],10:[function(require,module,exports){
 'use strict';
 
 function isNonNegativeInteger(value) {
@@ -631,6 +704,19 @@ function updateRegionUrl(state, imageIndex, regionId, url) {
   return nextState;
 }
 
+function clearImageRegions(state, imageIndex) {
+  var current = state || createEditorState();
+  var byIndex = current.regionsByIndex || {};
+  if (!byIndex[imageIndex] || byIndex[imageIndex].length === 0) {
+    return current;
+  }
+  var nextByIndex = shallowClone(byIndex);
+  delete nextByIndex[imageIndex];
+  var next = shallowClone(current);
+  next.regionsByIndex = nextByIndex;
+  return next;
+}
+
 function listRegions(state, imageIndex) {
   if (!state || !state.regionsByIndex) {
     return [];
@@ -646,12 +732,13 @@ module.exports = {
   addRegion: addRegion,
   removeRegion: removeRegion,
   updateRegionUrl: updateRegionUrl,
+  clearImageRegions: clearImageRegions,
   listRegions: listRegions,
   setImageDimensions: setImageDimensions,
   getImageDimensions: getImageDimensions
 };
 
-},{}],9:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 'use strict';
 
 var EDITOR_CONTAINER_ID = 'vitrine-editor';
@@ -726,7 +813,7 @@ if (typeof window !== 'undefined') {
   window.vitrineEditorView = editorView;
 }
 
-},{}],10:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 'use strict';
 
 function regionForExport(region) {
@@ -787,7 +874,7 @@ module.exports = {
   buildExportSnippet: buildExportSnippet
 };
 
-},{}],11:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 'use strict';
 
 var BUTTON_ID = 'vitrine-export-button';
@@ -844,7 +931,7 @@ module.exports = {
   OUTPUT_ID: OUTPUT_ID
 };
 
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 'use strict';
 
 var SELECTED_CLASS = 'vitrine-card-selected';
@@ -892,10 +979,14 @@ if (typeof window !== 'undefined') {
   window.vitrineImageSelection = imageSelection;
 }
 
-},{}],13:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 'use strict';
 
+var urlValidation = require('./url-validation');
+
 var REGION_LIST_ID = 'vitrine-region-list';
+var ROW_CLASS = 'vitrine-region-row';
+var INVALID_CLASS = 'vitrine-region-row--invalid';
 
 function findContainer(documentRef) {
   return documentRef.getElementById(REGION_LIST_ID);
@@ -907,6 +998,13 @@ function emptyContainer(container) {
   }
 }
 
+function rowClassNameFor(url) {
+  if (urlValidation.isValidUrl(url)) {
+    return ROW_CLASS;
+  }
+  return ROW_CLASS + ' ' + INVALID_CLASS;
+}
+
 function buildLabel(documentRef, region) {
   var label = documentRef.createElement('span');
   label.className = 'vitrine-region-label';
@@ -914,18 +1012,21 @@ function buildLabel(documentRef, region) {
   return label;
 }
 
-function buildUrlInput(documentRef, region, callbacks) {
+function buildUrlInput(documentRef, region, callbacks, onLocalChange) {
   var input = documentRef.createElement('input');
   input.type = 'url';
   input.value = region.url || '';
   input.placeholder = 'https://...';
   input.className = 'vitrine-region-url-input';
-  if (callbacks && callbacks.onUrlChange) {
-    input.addEventListener('input', function (event) {
-      var value = (event && event.target) ? event.target.value : input.value;
+  input.addEventListener('input', function (event) {
+    var value = (event && event.target) ? event.target.value : input.value;
+    if (onLocalChange) {
+      onLocalChange(value);
+    }
+    if (callbacks && callbacks.onUrlChange) {
       callbacks.onUrlChange(region.id, value);
-    });
-  }
+    }
+  });
   return input;
 }
 
@@ -943,12 +1044,20 @@ function buildRemoveButton(documentRef, region, callbacks) {
 
 function buildRegionRow(documentRef, region, callbacks) {
   var row = documentRef.createElement('div');
-  row.className = 'vitrine-region-row';
+  row.className = rowClassNameFor(region.url);
   row.setAttribute('data-region-id', region.id);
   row.appendChild(buildLabel(documentRef, region));
-  row.appendChild(buildUrlInput(documentRef, region, callbacks));
+  row.appendChild(buildUrlInput(documentRef, region, callbacks,
+    function (currentValue) { row.className = rowClassNameFor(currentValue); }));
   row.appendChild(buildRemoveButton(documentRef, region, callbacks));
   return row;
+}
+
+function buildEmptyState(documentRef) {
+  var element = documentRef.createElement('div');
+  element.className = 'vitrine-regions-empty';
+  element.textContent = 'Draw a rectangle on the image above to add a region.';
+  return element;
 }
 
 function renderRegionList(documentRef, regions, callbacks) {
@@ -957,6 +1066,10 @@ function renderRegionList(documentRef, regions, callbacks) {
     return;
   }
   emptyContainer(container);
+  if (regions.length === 0) {
+    container.appendChild(buildEmptyState(documentRef));
+    return;
+  }
   for (var i = 0; i < regions.length; i++) {
     container.appendChild(buildRegionRow(documentRef, regions[i], callbacks));
   }
@@ -964,10 +1077,11 @@ function renderRegionList(documentRef, regions, callbacks) {
 
 module.exports = {
   renderRegionList: renderRegionList,
-  REGION_LIST_ID: REGION_LIST_ID
+  REGION_LIST_ID: REGION_LIST_ID,
+  INVALID_CLASS: INVALID_CLASS
 };
 
-},{}],14:[function(require,module,exports){
+},{"./url-validation":17}],16:[function(require,module,exports){
 'use strict';
 
 var OVERLAY_BASE_STYLES = [
@@ -1018,7 +1132,28 @@ module.exports = {
   renderRegions: renderRegions
 };
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
+'use strict';
+
+var VALID_SCHEMES = ['http://', 'https://', 'mailto:', 'tel:'];
+
+function isValidUrl(url) {
+  if (typeof url !== 'string' || url.length === 0) {
+    return false;
+  }
+  for (var i = 0; i < VALID_SCHEMES.length; i++) {
+    if (url.indexOf(VALID_SCHEMES[i]) === 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+module.exports = {
+  isValidUrl: isValidUrl
+};
+
+},{}],18:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1144,7 +1279,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],16:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2696,14 +2831,14 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":15,"ieee754":18,"isarray":17}],17:[function(require,module,exports){
+},{"base64-js":18,"ieee754":21,"isarray":20}],20:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],18:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -2790,5 +2925,5 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}]},{},[2])(2)
+},{}]},{},[3])(3)
 });

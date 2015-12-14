@@ -43,6 +43,15 @@
       border-radius: 3px;
       font-size: 0.92em;
     }
+    #vitrine-error {
+      display: none;
+      padding: 1rem 1.25rem;
+      background: #fff0ef;
+      border: 1px solid #c84a44;
+      border-radius: 3px;
+      color: #8a2820;
+      margin-bottom: 1.5rem;
+    }
     h2.section-title {
       font-size: 0.85rem;
       font-weight: 600;
@@ -134,6 +143,40 @@
       font-size: 0.85rem;
     }
     .vitrine-region-remove:hover { background: #fde8e7; border-color: #c84a44; }
+    .vitrine-region-row--invalid { border-color: #c84a44; background: #fff8f7; }
+    .vitrine-region-row--invalid .vitrine-region-url-input {
+      border-color: #c84a44;
+    }
+    .vitrine-regions-empty {
+      padding: 1rem 1.25rem;
+      background: #ffffff;
+      border: 1px dashed #d4d4d4;
+      border-radius: 3px;
+      color: #888888;
+      font-style: italic;
+      text-align: center;
+    }
+    .vitrine-regions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2rem 0 1rem;
+    }
+    .vitrine-regions-header .section-title { margin: 0; }
+    #vitrine-clear-regions {
+      background: #ffffff;
+      color: #555;
+      border: 1px solid #d4d4d4;
+      border-radius: 3px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    #vitrine-clear-regions:hover {
+      background: #f0f0f0;
+      color: #c84a44;
+      border-color: #c84a44;
+    }
     #vitrine-export-button,
     #vitrine-copy-button {
       background: #1f1f1f;
@@ -174,6 +217,8 @@
   </header>
 
   <main class="layout">
+    <div id="vitrine-error" role="alert"></div>
+
     <div class="empty-state">
       Load this page with <code>#data=&lt;base64&gt;</code> in the URL to import
       images. Open any demo from the
@@ -186,7 +231,10 @@
     <h2 class="section-title">Editor</h2>
     <div id="vitrine-editor"></div>
 
-    <h2 class="section-title">Regions</h2>
+    <div class="vitrine-regions-header">
+      <h2 class="section-title">Regions</h2>
+      <button id="vitrine-clear-regions" type="button">Clear all</button>
+    </div>
     <div id="vitrine-region-list"></div>
 
     <h2 class="section-title">Export snippet</h2>

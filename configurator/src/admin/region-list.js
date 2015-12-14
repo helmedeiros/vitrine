@@ -56,12 +56,23 @@ function buildRegionRow(documentRef, region, callbacks) {
   return row;
 }
 
+function buildEmptyState(documentRef) {
+  var element = documentRef.createElement('div');
+  element.className = 'vitrine-regions-empty';
+  element.textContent = 'Draw a rectangle on the image above to add a region.';
+  return element;
+}
+
 function renderRegionList(documentRef, regions, callbacks) {
   var container = findContainer(documentRef);
   if (!container) {
     return;
   }
   emptyContainer(container);
+  if (regions.length === 0) {
+    container.appendChild(buildEmptyState(documentRef));
+    return;
+  }
   for (var i = 0; i < regions.length; i++) {
     container.appendChild(buildRegionRow(documentRef, regions[i], callbacks));
   }

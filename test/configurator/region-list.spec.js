@@ -110,6 +110,23 @@ describe('renderRegionList', function () {
     }).to.not.throw();
   });
 
+  it('renders an empty-state hint when no regions are present', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container), []);
+    expect(container.children).to.have.length(1);
+    expect(container.children[0].className).to.contain('vitrine-regions-empty');
+    expect(container.children[0].textContent).to.contain('Draw a rectangle');
+  });
+
+  it('replaces the empty-state with rows when regions are added', function () {
+    var container = fakeElement('div');
+    regionList.renderRegionList(fakeDocument(container), []);
+    regionList.renderRegionList(fakeDocument(container),
+      [{id: 'r1', x: 0, y: 0, width: 1, height: 1}]);
+    expect(container.children).to.have.length(1);
+    expect(container.children[0].className).to.contain('vitrine-region-row');
+  });
+
   it('renders a remove button per row', function () {
     var container = fakeElement('div');
     regionList.renderRegionList(fakeDocument(container),

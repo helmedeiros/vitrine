@@ -43,6 +43,15 @@
       border-radius: 3px;
       font-size: 0.92em;
     }
+    #vitrine-error {
+      display: none;
+      padding: 1rem 1.25rem;
+      background: #fff0ef;
+      border: 1px solid #c84a44;
+      border-radius: 3px;
+      color: #8a2820;
+      margin-bottom: 1.5rem;
+    }
     h2.section-title {
       font-size: 0.85rem;
       font-weight: 600;
@@ -208,6 +217,8 @@
   </header>
 
   <main class="layout">
+    <div id="vitrine-error" role="alert"></div>
+
     <div class="empty-state">
       Load this page with <code>#data=&lt;base64&gt;</code> in the URL to import
       images. Open any demo from the

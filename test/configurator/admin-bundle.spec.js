@@ -109,6 +109,26 @@ describe('admin bundle in jsdom', function () {
     });
   });
 
+  it('surfaces a visible error when the hash payload is malformed',
+    function (done) {
+      var html = '<!doctype html><html><body>' +
+        '<div id="vitrine-error"></div>' +
+        '<ul id="vitrine-image-list"></ul>' +
+        '</body></html>';
+      jsdom.env({
+        url: 'http://admin/#data=not-base64-or-json',
+        html: html,
+        src: [loadBundle()],
+        done: function (err, win) {
+          if (err) { done(err); return; }
+          var errorEl = win.document.getElementById('vitrine-error');
+          expect(errorEl.textContent.length).to.be.greaterThan(0);
+          expect(errorEl.style.display).to.equal('block');
+          done();
+        }
+      });
+    });
+
   it('renders a region list row with a URL input after a drag', function (done) {
     var html = '<!doctype html><html><body>' +
       '<div class="empty-state">load me</div>' +

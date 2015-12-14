@@ -12,6 +12,7 @@ var exportPanel = require('./export-panel');
 var dimCapture = require('./dim-capture');
 var draftStorage = require('./draft-storage');
 var clearRegions = require('./clear-regions');
+var adminErrors = require('./admin-errors');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -123,7 +124,21 @@ function start(windowRef, documentRef) {
   if (!fragment) {
     return;
   }
-  var payload = shell.decodePayload(fragment);
+  var payload;
+  try {
+    payload = shell.decodePayload(fragment);
+  } catch (decodeError) {
+    adminErrors.showError(documentRef,
+      'Could not decode the image payload from the URL: ' +
+      (decodeError && decodeError.message ? decodeError.message : 'unknown error'));
+    return;
+  }
+  if (!payload || !Array.isArray(payload.images)) {
+    adminErrors.showError(documentRef,
+      'The payload from the URL did not contain an images array.');
+    return;
+  }
+  adminErrors.hideError(documentRef);
   var existingDraft = draftStorage.loadDraft(storage, payload.pageUrl);
   var currentState = existingDraft || state.createEditorState();
 

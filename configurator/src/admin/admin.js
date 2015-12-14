@@ -11,6 +11,7 @@ var exportConfig = require('./export-config');
 var exportPanel = require('./export-panel');
 var dimCapture = require('./dim-capture');
 var draftStorage = require('./draft-storage');
+var clearRegions = require('./clear-regions');
 
 function nextRegionId(currentState) {
   var index = currentState.selectedIndex;
@@ -152,6 +153,14 @@ function start(windowRef, documentRef) {
       exportConfig.buildExportConfig(getState(), payload));
   });
   exportPanel.attachCopyButton(documentRef);
+  clearRegions.attachClearButton(documentRef, function () {
+    var current = getState();
+    if (current.selectedIndex === null || current.selectedIndex === undefined) {
+      return;
+    }
+    setState(state.clearImageRegions(current, current.selectedIndex));
+    refreshEditor(documentRef, getState, setState, payload);
+  });
 }
 
 function bind(windowRef, documentRef) {

@@ -155,6 +155,19 @@ function updateRegionUrl(state, imageIndex, regionId, url) {
   return nextState;
 }
 
+function clearImageRegions(state, imageIndex) {
+  var current = state || createEditorState();
+  var byIndex = current.regionsByIndex || {};
+  if (!byIndex[imageIndex] || byIndex[imageIndex].length === 0) {
+    return current;
+  }
+  var nextByIndex = shallowClone(byIndex);
+  delete nextByIndex[imageIndex];
+  var next = shallowClone(current);
+  next.regionsByIndex = nextByIndex;
+  return next;
+}
+
 function listRegions(state, imageIndex) {
   if (!state || !state.regionsByIndex) {
     return [];
@@ -170,6 +183,7 @@ module.exports = {
   addRegion: addRegion,
   removeRegion: removeRegion,
   updateRegionUrl: updateRegionUrl,
+  clearImageRegions: clearImageRegions,
   listRegions: listRegions,
   setImageDimensions: setImageDimensions,
   getImageDimensions: getImageDimensions

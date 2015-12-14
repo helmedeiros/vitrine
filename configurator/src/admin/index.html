@@ -143,6 +143,27 @@
       font-style: italic;
       text-align: center;
     }
+    .vitrine-regions-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 2rem 0 1rem;
+    }
+    .vitrine-regions-header .section-title { margin: 0; }
+    #vitrine-clear-regions {
+      background: #ffffff;
+      color: #555;
+      border: 1px solid #d4d4d4;
+      border-radius: 3px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    #vitrine-clear-regions:hover {
+      background: #f0f0f0;
+      color: #c84a44;
+      border-color: #c84a44;
+    }
     #vitrine-export-button,
     #vitrine-copy-button {
       background: #1f1f1f;
@@ -195,7 +216,10 @@
     <h2 class="section-title">Editor</h2>
     <div id="vitrine-editor"></div>
 
-    <h2 class="section-title">Regions</h2>
+    <div class="vitrine-regions-header">
+      <h2 class="section-title">Regions</h2>
+      <button id="vitrine-clear-regions" type="button">Clear all</button>
+    </div>
     <div id="vitrine-region-list"></div>
 
     <h2 class="section-title">Export snippet</h2>

@@ -219,6 +219,38 @@ describe('getImageDimensions', function () {
   });
 });
 
+describe('clearImageRegions', function () {
+  it('removes every region from the named image', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'a'}));
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'b'}));
+    s = editorState.clearImageRegions(s, 0);
+    expect(s.regionsByIndex[0]).to.equal(undefined);
+  });
+
+  it('is a no-op when the image has no regions', function () {
+    var s = editorState.createEditorState();
+    var same = editorState.clearImageRegions(s, 0);
+    expect(same).to.equal(s);
+  });
+
+  it('does not affect regions on other images', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'a'}));
+    s = editorState.addRegion(s, 1, sampleRegion({id: 'b'}));
+    s = editorState.clearImageRegions(s, 0);
+    expect(s.regionsByIndex[1]).to.have.length(1);
+  });
+
+  it('does not mutate the prior state', function () {
+    var s = editorState.createEditorState();
+    s = editorState.addRegion(s, 0, sampleRegion({id: 'a'}));
+    var before = s.regionsByIndex[0];
+    editorState.clearImageRegions(s, 0);
+    expect(s.regionsByIndex[0]).to.equal(before);
+  });
+});
+
 describe('updateRegionUrl', function () {
   it('attaches the url to the named region', function () {
     var s = editorState.createEditorState();

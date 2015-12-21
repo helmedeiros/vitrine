@@ -31,7 +31,8 @@ function autoStart(windowRef, documentRef, options) {
   });
   return runtime.mountDiscoveryPanel(documentRef, {
     imageCount: detected.length,
-    adminUrl: payloadUrl
+    adminUrl: payloadUrl,
+    windowRef: windowRef
   });
 }
 

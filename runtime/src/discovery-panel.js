@@ -1,5 +1,7 @@
 'use strict';
 
+var DISMISSED_KEY = 'vitrine-discovery-dismissed';
+
 var PANEL_STYLES = [
   'position:fixed', 'top:12px', 'right:12px',
   'background:#1f1f1f', 'color:#ffffff',
@@ -15,6 +17,13 @@ var BUTTON_STYLES = [
   'padding:5px 10px', 'background:#e95950', 'color:#ffffff',
   'text-decoration:none', 'border-radius:3px',
   'font-weight:bold'
+].join(';');
+
+var CLOSE_STYLES = [
+  'display:inline-block', 'margin-left:10px',
+  'padding:0 6px', 'color:#cccccc',
+  'text-decoration:none', 'font-size:16px',
+  'line-height:1', 'cursor:pointer'
 ].join(';');
 
 function validateDocument(documentRef) {
@@ -52,6 +61,47 @@ function buildButton(documentRef, adminUrl) {
   return button;
 }
 
+function isDismissed(windowRef) {
+  if (!windowRef || !windowRef.sessionStorage) {
+    return false;
+  }
+  try {
+    return windowRef.sessionStorage.getItem(DISMISSED_KEY) === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
+function markDismissed(windowRef) {
+  if (!windowRef || !windowRef.sessionStorage) {
+    return;
+  }
+  try {
+    windowRef.sessionStorage.setItem(DISMISSED_KEY, '1');
+  } catch (e) {
+    return;
+  }
+}
+
+function buildCloseButton(documentRef, panel, windowRef) {
+  var close = documentRef.createElement('a');
+  close.textContent = '×';
+  close.href = '#';
+  close.setAttribute('data-vitrine-close', '');
+  close.setAttribute('title', 'Hide for this session');
+  close.style.cssText = CLOSE_STYLES;
+  close.addEventListener('click', function (event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    markDismissed(windowRef);
+    if (panel.parentNode && typeof panel.parentNode.removeChild === 'function') {
+      panel.parentNode.removeChild(panel);
+    }
+  });
+  return close;
+}
+
 function buildPanel(documentRef, options) {
   validateDocument(documentRef);
   validateOptions(options);
@@ -60,10 +110,14 @@ function buildPanel(documentRef, options) {
   container.style.cssText = PANEL_STYLES;
   container.appendChild(buildLabel(documentRef, options.imageCount));
   container.appendChild(buildButton(documentRef, options.adminUrl));
+  container.appendChild(buildCloseButton(documentRef, container, options.windowRef));
   return container;
 }
 
 function mountPanel(documentRef, options) {
+  if (options && isDismissed(options.windowRef)) {
+    return null;
+  }
   var panel = buildPanel(documentRef, options);
   documentRef.body.appendChild(panel);
   return panel;
@@ -71,5 +125,8 @@ function mountPanel(documentRef, options) {
 
 module.exports = {
   buildPanel: buildPanel,
-  mountPanel: mountPanel
+  mountPanel: mountPanel,
+  isDismissed: isDismissed,
+  markDismissed: markDismissed,
+  DISMISSED_KEY: DISMISSED_KEY
 };

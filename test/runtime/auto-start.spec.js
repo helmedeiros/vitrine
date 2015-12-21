@@ -22,7 +22,8 @@ function fakeElement(tagName) {
     target: '',
     attributes: {},
     appendChild: function (child) { this.children.push(child); },
-    setAttribute: function (name, value) { this.attributes[name] = value; }
+    setAttribute: function (name, value) { this.attributes[name] = value; },
+    addEventListener: function () { return; }
   };
 }
 

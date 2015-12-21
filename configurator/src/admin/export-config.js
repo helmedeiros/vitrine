@@ -1,5 +1,7 @@
 'use strict';
 
+var urlValidation = require('./url-validation');
+
 function regionForExport(region) {
   return {
     x: region.x,
@@ -53,7 +55,27 @@ function buildExportSnippet(config) {
   return '<script>window.VITRINE_CONFIG = ' + JSON.stringify(config) + ';</script>';
 }
 
+function hasInvalidRegionUrls(state) {
+  if (!state || !state.regionsByIndex) {
+    return false;
+  }
+  var byIndex = state.regionsByIndex;
+  for (var indexStr in byIndex) {
+    if (!byIndex.hasOwnProperty(indexStr)) {
+      continue;
+    }
+    var regions = byIndex[indexStr];
+    for (var i = 0; i < regions.length; i++) {
+      if (!urlValidation.isValidUrl(regions[i].url)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 module.exports = {
   buildExportConfig: buildExportConfig,
-  buildExportSnippet: buildExportSnippet
+  buildExportSnippet: buildExportSnippet,
+  hasInvalidRegionUrls: hasInvalidRegionUrls
 };

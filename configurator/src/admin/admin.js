@@ -143,10 +143,17 @@ function start(windowRef, documentRef) {
   var currentState = existingDraft || state.createEditorState();
 
   function getState() { return currentState; }
+  function refreshExportAvailability(forState) {
+    exportPanel.setExportDisabled(documentRef,
+      exportConfig.hasInvalidRegionUrls(forState),
+      'One or more regions have an invalid URL');
+  }
   function setState(next) {
     currentState = next;
     draftStorage.saveDraft(storage, payload.pageUrl, next);
+    refreshExportAvailability(next);
   }
+  refreshExportAvailability(currentState);
 
   var count = shell.renderImageList(documentRef, payload);
   if (count === 0) {

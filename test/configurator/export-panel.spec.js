@@ -174,3 +174,43 @@ describe('attachCopyButton', function () {
     }
   });
 });
+
+describe('setExportDisabled', function () {
+  function fakeButton() {
+    return {
+      disabled: false,
+      attributes: {},
+      setAttribute: function (name, value) { this.attributes[name] = value; }
+    };
+  }
+
+  function fakeDocument(button) {
+    return {
+      getElementById: function (id) {
+        return id === 'vitrine-export-button' ? button : null;
+      }
+    };
+  }
+
+  it('disables the export button and sets a tooltip when invalid', function () {
+    var button = fakeButton();
+    exportPanel.setExportDisabled(fakeDocument(button), true, 'Some URLs invalid');
+    expect(button.disabled).to.equal(true);
+    expect(button.attributes.title).to.equal('Some URLs invalid');
+  });
+
+  it('enables the export button and clears the tooltip when valid', function () {
+    var button = fakeButton();
+    button.disabled = true;
+    button.attributes.title = 'old';
+    exportPanel.setExportDisabled(fakeDocument(button), false);
+    expect(button.disabled).to.equal(false);
+    expect(button.attributes.title).to.equal('');
+  });
+
+  it('is a no-op when the button is missing', function () {
+    expect(function () {
+      exportPanel.setExportDisabled(fakeDocument(null), true);
+    }).to.not.throw();
+  });
+});

@@ -47,9 +47,25 @@ function attachCopyButton(documentRef) {
   });
 }
 
+function setExportDisabled(documentRef, disabled, reason) {
+  var button = documentRef.getElementById(BUTTON_ID);
+  if (!button) {
+    return;
+  }
+  button.disabled = Boolean(disabled);
+  if (typeof button.setAttribute === 'function') {
+    if (disabled) {
+      button.setAttribute('title', reason || 'Export is disabled');
+    } else {
+      button.setAttribute('title', '');
+    }
+  }
+}
+
 module.exports = {
   attachExportButton: attachExportButton,
   attachCopyButton: attachCopyButton,
+  setExportDisabled: setExportDisabled,
   BUTTON_ID: BUTTON_ID,
   OUTPUT_ID: OUTPUT_ID
 };

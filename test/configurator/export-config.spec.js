@@ -91,6 +91,39 @@ describe('buildExportConfig', function () {
     });
 });
 
+describe('hasInvalidRegionUrls', function () {
+  it('returns false for empty state', function () {
+    expect(exportConfig.hasInvalidRegionUrls(editorState.createEditorState()))
+      .to.equal(false);
+  });
+
+  it('returns false when every region has a valid URL', function () {
+    var s = editorState.createEditorState();
+    s = withRegion(s, 0, {id: 'r1', x: 0, y: 0, width: 1, height: 1});
+    s = withUrl(s, 0, 'r1', 'http://shop/p/1');
+    expect(exportConfig.hasInvalidRegionUrls(s)).to.equal(false);
+  });
+
+  it('returns true when any region is missing a URL', function () {
+    var s = editorState.createEditorState();
+    s = withRegion(s, 0, {id: 'r1', x: 0, y: 0, width: 1, height: 1});
+    expect(exportConfig.hasInvalidRegionUrls(s)).to.equal(true);
+  });
+
+  it('returns true when any region has an unsafe scheme', function () {
+    var s = editorState.createEditorState();
+    s = withRegion(s, 0, {id: 'r1', x: 0, y: 0, width: 1, height: 1});
+    s = withUrl(s, 0, 'r1', 'http://valid/');
+    s = withRegion(s, 1, {id: 'r2', x: 0, y: 0, width: 1, height: 1});
+    s = withUrl(s, 1, 'r2', 'javascr' + 'ipt:alert(1)');
+    expect(exportConfig.hasInvalidRegionUrls(s)).to.equal(true);
+  });
+
+  it('returns false for null state', function () {
+    expect(exportConfig.hasInvalidRegionUrls(null)).to.equal(false);
+  });
+});
+
 describe('buildExportSnippet', function () {
   it('wraps a config in a <script> tag setting window.VITRINE_CONFIG', function () {
     var snippet = exportConfig.buildExportSnippet({images: []});

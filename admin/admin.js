@@ -108,7 +108,7 @@ if (typeof window !== 'undefined') {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":19}],3:[function(require,module,exports){
+},{"buffer":20}],3:[function(require,module,exports){
 'use strict';
 
 var shell = require('./admin-shell');
@@ -124,16 +124,11 @@ var dimCapture = require('./dim-capture');
 var draftStorage = require('./draft-storage');
 var clearRegions = require('./clear-regions');
 var adminErrors = require('./admin-errors');
+var regionId = require('./region-id');
 
-function nextRegionId(currentState) {
-  var index = currentState.selectedIndex;
-  var existing = (currentState.regionsByIndex || {})[index] || [];
-  return 'r-' + index + '-' + (existing.length + 1);
-}
-
-function regionFromRect(currentState, rect) {
+function regionFromRect(rect) {
   return {
-    id: nextRegionId(currentState),
+    id: regionId.defaultGenerator(),
     x: rect.x,
     y: rect.y,
     width: rect.width,
@@ -187,7 +182,7 @@ function buildOnDragEnd(getState, setState, documentRef, overlay,
     if (current.selectedIndex === null) {
       return;
     }
-    var region = regionFromRect(current, rect);
+    var region = regionFromRect(rect);
     var updated = state.addRegion(current, current.selectedIndex, region);
     updated = captureImageDimensions(updated, getImageElement());
     setState(updated);
@@ -254,10 +249,17 @@ function start(windowRef, documentRef) {
   var currentState = existingDraft || state.createEditorState();
 
   function getState() { return currentState; }
+  function refreshExportAvailability(forState) {
+    exportPanel.setExportDisabled(documentRef,
+      exportConfig.hasInvalidRegionUrls(forState),
+      'One or more regions have an invalid URL');
+  }
   function setState(next) {
     currentState = next;
     draftStorage.saveDraft(storage, payload.pageUrl, next);
+    refreshExportAvailability(next);
   }
+  refreshExportAvailability(currentState);
 
   var count = shell.renderImageList(documentRef, payload);
   if (count === 0) {
@@ -273,6 +275,8 @@ function start(windowRef, documentRef) {
       currentState.selectedIndex !== undefined) {
     selection.markSelectedCard(documentRef, currentState.selectedIndex);
     refreshEditor(documentRef, getState, setState, payload);
+  } else {
+    view.renderEditorEmptyState(documentRef);
   }
   exportPanel.attachExportButton(documentRef, function () {
     return exportConfig.buildExportSnippet(
@@ -309,7 +313,7 @@ module.exports = {
   bind: bind
 };
 
-},{"./admin-errors":1,"./admin-shell":2,"./clear-regions":4,"./dim-capture":5,"./draft-storage":6,"./drag-handlers":7,"./editor-state":10,"./editor-view":11,"./export-config":12,"./export-panel":13,"./image-selection":14,"./region-list":15,"./region-overlays":16}],4:[function(require,module,exports){
+},{"./admin-errors":1,"./admin-shell":2,"./clear-regions":4,"./dim-capture":5,"./draft-storage":6,"./drag-handlers":7,"./editor-state":10,"./editor-view":11,"./export-config":12,"./export-panel":13,"./image-selection":14,"./region-id":15,"./region-list":16,"./region-overlays":17}],4:[function(require,module,exports){
 'use strict';
 
 function attachClearButton(documentRef, onClear) {
@@ -799,9 +803,22 @@ function unmountEditor(documentRef) {
   emptyContainer(container);
 }
 
+function renderEditorEmptyState(documentRef) {
+  var container = findEditorContainer(documentRef);
+  if (!container) {
+    return;
+  }
+  emptyContainer(container);
+  var hint = documentRef.createElement('div');
+  hint.className = 'vitrine-editor-empty';
+  hint.textContent = 'Select an image above to start drawing regions.';
+  container.appendChild(hint);
+}
+
 var editorView = {
   mountSelectedImage: mountSelectedImage,
   unmountEditor: unmountEditor,
+  renderEditorEmptyState: renderEditorEmptyState,
   EDITOR_CONTAINER_ID: EDITOR_CONTAINER_ID
 };
 
@@ -815,6 +832,8 @@ if (typeof window !== 'undefined') {
 
 },{}],12:[function(require,module,exports){
 'use strict';
+
+var urlValidation = require('./url-validation');
 
 function regionForExport(region) {
   return {
@@ -869,12 +888,32 @@ function buildExportSnippet(config) {
   return '<script>window.VITRINE_CONFIG = ' + JSON.stringify(config) + ';</script>';
 }
 
+function hasInvalidRegionUrls(state) {
+  if (!state || !state.regionsByIndex) {
+    return false;
+  }
+  var byIndex = state.regionsByIndex;
+  for (var indexStr in byIndex) {
+    if (!byIndex.hasOwnProperty(indexStr)) {
+      continue;
+    }
+    var regions = byIndex[indexStr];
+    for (var i = 0; i < regions.length; i++) {
+      if (!urlValidation.isValidUrl(regions[i].url)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 module.exports = {
   buildExportConfig: buildExportConfig,
-  buildExportSnippet: buildExportSnippet
+  buildExportSnippet: buildExportSnippet,
+  hasInvalidRegionUrls: hasInvalidRegionUrls
 };
 
-},{}],13:[function(require,module,exports){
+},{"./url-validation":18}],13:[function(require,module,exports){
 'use strict';
 
 var BUTTON_ID = 'vitrine-export-button';
@@ -924,9 +963,25 @@ function attachCopyButton(documentRef) {
   });
 }
 
+function setExportDisabled(documentRef, disabled, reason) {
+  var button = documentRef.getElementById(BUTTON_ID);
+  if (!button) {
+    return;
+  }
+  button.disabled = Boolean(disabled);
+  if (typeof button.setAttribute === 'function') {
+    if (disabled) {
+      button.setAttribute('title', reason || 'Export is disabled');
+    } else {
+      button.setAttribute('title', '');
+    }
+  }
+}
+
 module.exports = {
   attachExportButton: attachExportButton,
   attachCopyButton: attachCopyButton,
+  setExportDisabled: setExportDisabled,
   BUTTON_ID: BUTTON_ID,
   OUTPUT_ID: OUTPUT_ID
 };
@@ -980,6 +1035,22 @@ if (typeof window !== 'undefined') {
 }
 
 },{}],15:[function(require,module,exports){
+'use strict';
+
+var counter = 0;
+
+function defaultGenerator() {
+  counter = counter + 1;
+  var timeComponent = Date.now().toString(36);
+  var randomComponent = Math.floor(Math.random() * 1000000).toString(36);
+  return 'r-' + timeComponent + counter.toString(36) + '-' + randomComponent;
+}
+
+module.exports = {
+  defaultGenerator: defaultGenerator
+};
+
+},{}],16:[function(require,module,exports){
 'use strict';
 
 var urlValidation = require('./url-validation');
@@ -1081,7 +1152,7 @@ module.exports = {
   INVALID_CLASS: INVALID_CLASS
 };
 
-},{"./url-validation":17}],16:[function(require,module,exports){
+},{"./url-validation":18}],17:[function(require,module,exports){
 'use strict';
 
 var OVERLAY_BASE_STYLES = [
@@ -1132,7 +1203,7 @@ module.exports = {
   renderRegions: renderRegions
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 'use strict';
 
 var VALID_SCHEMES = ['http://', 'https://', 'mailto:', 'tel:'];
@@ -1153,7 +1224,7 @@ module.exports = {
   isValidUrl: isValidUrl
 };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -1279,7 +1350,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (global){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2831,14 +2902,14 @@ function blitBuffer (src, dst, offset, length) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"base64-js":18,"ieee754":21,"isarray":20}],20:[function(require,module,exports){
+},{"base64-js":19,"ieee754":22,"isarray":21}],21:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m

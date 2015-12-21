@@ -13,16 +13,11 @@ var dimCapture = require('./dim-capture');
 var draftStorage = require('./draft-storage');
 var clearRegions = require('./clear-regions');
 var adminErrors = require('./admin-errors');
+var regionId = require('./region-id');
 
-function nextRegionId(currentState) {
-  var index = currentState.selectedIndex;
-  var existing = (currentState.regionsByIndex || {})[index] || [];
-  return 'r-' + index + '-' + (existing.length + 1);
-}
-
-function regionFromRect(currentState, rect) {
+function regionFromRect(rect) {
   return {
-    id: nextRegionId(currentState),
+    id: regionId.defaultGenerator(),
     x: rect.x,
     y: rect.y,
     width: rect.width,
@@ -76,7 +71,7 @@ function buildOnDragEnd(getState, setState, documentRef, overlay,
     if (current.selectedIndex === null) {
       return;
     }
-    var region = regionFromRect(current, rect);
+    var region = regionFromRect(rect);
     var updated = state.addRegion(current, current.selectedIndex, region);
     updated = captureImageDimensions(updated, getImageElement());
     setState(updated);

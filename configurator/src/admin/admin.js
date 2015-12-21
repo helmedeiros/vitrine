@@ -164,6 +164,8 @@ function start(windowRef, documentRef) {
       currentState.selectedIndex !== undefined) {
     selection.markSelectedCard(documentRef, currentState.selectedIndex);
     refreshEditor(documentRef, getState, setState, payload);
+  } else {
+    view.renderEditorEmptyState(documentRef);
   }
   exportPanel.attachExportButton(documentRef, function () {
     return exportConfig.buildExportSnippet(

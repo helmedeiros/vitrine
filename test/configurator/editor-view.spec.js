@@ -107,3 +107,27 @@ describe('unmountEditor', function () {
     }).to.not.throw();
   });
 });
+
+describe('renderEditorEmptyState', function () {
+  it('appends a hint element to the editor container', function () {
+    var container = makeFakeElement('div');
+    editorView.renderEditorEmptyState(fakeDocument(container));
+    expect(container.children).to.have.length(1);
+    expect(container.children[0].className).to.contain('vitrine-editor-empty');
+    expect(container.children[0].textContent).to.contain('Select an image');
+  });
+
+  it('replaces any prior contents of the editor container', function () {
+    var container = makeFakeElement('div');
+    editorView.mountSelectedImage(fakeDocument(container), {src: 'a'});
+    editorView.renderEditorEmptyState(fakeDocument(container));
+    expect(container.children).to.have.length(1);
+    expect(container.children[0].className).to.contain('vitrine-editor-empty');
+  });
+
+  it('is a no-op when the container is missing', function () {
+    expect(function () {
+      editorView.renderEditorEmptyState(fakeDocument(null));
+    }).to.not.throw();
+  });
+});

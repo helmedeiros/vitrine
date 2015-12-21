@@ -58,9 +58,22 @@ function unmountEditor(documentRef) {
   emptyContainer(container);
 }
 
+function renderEditorEmptyState(documentRef) {
+  var container = findEditorContainer(documentRef);
+  if (!container) {
+    return;
+  }
+  emptyContainer(container);
+  var hint = documentRef.createElement('div');
+  hint.className = 'vitrine-editor-empty';
+  hint.textContent = 'Select an image above to start drawing regions.';
+  container.appendChild(hint);
+}
+
 var editorView = {
   mountSelectedImage: mountSelectedImage,
   unmountEditor: unmountEditor,
+  renderEditorEmptyState: renderEditorEmptyState,
   EDITOR_CONTAINER_ID: EDITOR_CONTAINER_ID
 };
 
